@@ -5,6 +5,11 @@
       <text class="title">{{ title }}</text>
     </view>
   </view>
+  <view></view>
+  <image src="" mode="" />
+  <button type="default"></button>
+  <view></view>
+  <button type="primary"></button>
 </template>
 
 <script setup lang="ts">
