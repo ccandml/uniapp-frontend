@@ -1,7 +1,28 @@
-// tsconfig.json
 {
   "extends": "@vue/tsconfig/tsconfig.json",
   "compilerOptions": {
+    // 严格模式（保留）  
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    // TS 5 修复废弃选项（关键新增）  
+    "verbatimModuleSyntax": true, // ✅ 替换 importsNotUsedAsValues  
+    "noEmit": true, // ✅ 解锁 allowImportingTsExtensions  
+    // TS 5 优化（完整）  
+    "target": "ES2020",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+    "skipLibCheck": true,
+    // 原有（保留）  
+    "jsx": "preserve",
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
@@ -9,20 +30,15 @@
         "./src/*"
       ]
     },
-    "lib": [
-      "esnext",
-      "dom"
-    ],
-    // 类型声明文件
     "types": [
-      "@dcloudio/types", // uni-app API 类型
-      "miniprogram-api-typings", // 原生微信小程序类型
-      "@uni-helper/uni-app-types" // uni-app 组件类型
+      "@dcloudio/types",
+      "miniprogram-api-typings",
+      "@uni-helper/uni-app-types",
+      "@uni-helper/uni-ui-types",
+      "vite/client"
     ]
   },
-  // vue 编译器类型，校验标签类型
   "vueCompilerOptions": {
-    // 原配置 experimentalRuntimeMode 已废弃，请升级 Vue - Official 插件至最新版本
     "plugins": [
       "@uni-helper/uni-app-types/volar-plugin"
     ]
@@ -32,5 +48,11 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.js",
+    "**/*.vue.js"
   ]
 }

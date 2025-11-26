@@ -13,7 +13,8 @@
  */
 
 /* 颜色变量 */
-
+// @import '@/style/base-style.scss';
+@use '@/style/base-style.scss' as *;
 /* 行为相关颜色 */
 $uni-color-primary: #007aff;
 $uni-color-success: #4cd964;

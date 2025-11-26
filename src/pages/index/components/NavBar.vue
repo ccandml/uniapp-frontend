@@ -1,0 +1,63 @@
+<script setup>
+const { safeAreaInsets } = uni.getSystemInfoSync()
+// console.log(safeAreaInsets)
+</script>
+
+<template>
+  <view class="navbar" :style="{ 'padding-top': safeAreaInsets?.top + 'px' }">
+    <view class="top">
+      <image src="@/static/images/logo.png" mode="aspectFit" />
+      <text>新鲜 · 亲民 · 快捷</text>
+    </view>
+    <view class="search">
+      <view class="left">
+        <uni-icons type="search" size="20" color="white"></uni-icons>
+        <text>搜索商品</text>
+      </view>
+      <view class="right">
+        <uni-icons type="scan" size="20" color="white"></uni-icons>
+      </view>
+    </view>
+  </view>
+</template>
+
+<style scoped lang="scss">
+.navbar {
+  padding: 20rpx 0;
+  background: url(@/static/images/navigator_bg.png) no-repeat;
+  .top {
+    padding: 20rpx;
+    display: flex;
+    align-items: center;
+    image {
+      width: 166rpx;
+      height: 39rpx;
+      margin: 0 20rpx;
+    }
+    text {
+      border-left: 1px solid white;
+      padding: 0 20rpx;
+      color: #fff;
+      font-size: 26rpx;
+    }
+  }
+  .search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 20rpx;
+    padding: 0 20rpx;
+    height: 65rpx;
+    border-radius: 60rpx;
+    background-color: rgba($color: #fff, $alpha: 0.6);
+    .left {
+      display: flex;
+      align-items: center;
+    }
+    text {
+      color: #fff;
+      font-size: 30rpx;
+    }
+  }
+}
+</style>
