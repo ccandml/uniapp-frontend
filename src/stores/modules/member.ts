@@ -1,3 +1,4 @@
+import type { MemberData } from '@/types/member'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -5,9 +6,9 @@ export const useMemberStore = defineStore(
   'member',
   () => {
     //   会员信息
-    const profile = ref<any>()
+    const profile = ref<MemberData>()
     //   保存会员信息
-    const setProfile = (val: any) => {
+    const setProfile = (val: MemberData) => {
       profile.value = val
     }
     //   清理会员信息

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { HotList } from '@/pages/types/home'
+import type { HotList } from '@/types/home'
 
 defineProps<{ list: HotList[] }>()
 </script>

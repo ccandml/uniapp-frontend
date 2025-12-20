@@ -1,5 +1,5 @@
-import type { PagesRequest, PagesResult } from '@/pages/types/global'
-import type { BannerList, CategoryList, GuessList, HotList } from '@/pages/types/home'
+import type { PagesRequest, PagesResult } from '@/types/global'
+import type { BannerList, CategoryList, GuessList, HotList } from '@/types/home'
 import { http } from '@/utils/request'
 
 // 获取轮播图

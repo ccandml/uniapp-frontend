@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { getHotDetailAPI } from '@/service/hot'
-import type { HotPanelData, HotRquest } from '../types/hot'
+import type { HotPanelData, HotRquest } from '../../types/hot'
 import { onLoad } from '@dcloudio/uni-app'
-import type { GoodsItems, PagesResult } from '../types/global'
+import type { GoodsItems, PagesResult } from '../../types/global'
 // 四个请求
 const MapRequestData = [
   { type: '1', url: '/hot/preference' },
@@ -100,7 +100,7 @@ onLoad(() => {
           class="navigator"
           v-for="item in subTypesList![activeIndex]?.goodsItems.items"
           :key="item.id"
-          url="/pages/"
+          :url="`/pages/goodsDetail/goodsDetail?id=${item.id}`"
           open-type="navigate"
           hover-class="navigator-hover"
         >

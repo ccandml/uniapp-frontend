@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import NavBar from '@/pages/index/components/NavBar.vue'
-import XtxBanner from '../components/XtxBanner.vue'
+import XtxBanner from '@/components/XtxBanner.vue'
 import CategoryPanel from './components/CategoryPanel.vue'
 import HotPanel from './components/HotPanel.vue'
-import XtxGuess from '../components/XtxGuess.vue'
+import XtxGuess from '@/components/XtxGuess.vue'
 import SkeletonPage from './components/SkeletonPage.vue'
-import type { XtxGuessInstance } from '../types/components'
-import type { BannerList, CategoryList, HotList } from '../types/home'
+import type { XtxGuessInstance } from '../../types/components'
+import type { BannerList, CategoryList, HotList } from '../../types/home'
 import { getBannerAPI, getHomeCategoryAPI, getHomeHotAPI } from '@/service/home'
 import { onLoad } from '@dcloudio/uni-app'
 const XtxGuessRef = ref<XtxGuessInstance>()
@@ -93,12 +93,19 @@ onLoad(async () => {
 
 <style scoped lang="scss">
 // h5导航栏是dom元素（建立在body里面page外面），占用空间，100%是继承剩余的空间
-
+page {
+  height: 100%;
+}
 .body {
   display: flex;
   flex-direction: column;
   background-color: #f7f7f7;
+  /* #ifdef H5 */
+  height: 100%;
+  /* #endif */
+  /* #ifndef H5 */
   height: 100vh;
+  /* #endif */
   overflow: hidden;
   .scroll {
     flex: 1;

@@ -1,5 +1,5 @@
-import type XtxGuess from '../components/XtxGuess.vue'
-import type XtxBanner from '../components/XtxBanner.vue'
+import XtxGuess from '@/components/XtxGuess.vue'
+import XtxBanner from '@/components/XtxBanner.vue'
 import type CategoryPanel from '../index/components/CategoryPanel.vue'
 import type HotPanel from '../index/components/HotPanel.vue'
 // 拿到的是一个实例类型

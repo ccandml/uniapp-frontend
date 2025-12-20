@@ -31,7 +31,9 @@
 		{
 			"path": "pages/user/user",
 			"style": {
-				"navigationBarTitleText": "我的"
+				"navigationBarTitleText": "我的",
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white"
 			}
 		},
 		{
@@ -44,6 +46,30 @@
 			"path": "pages/Recommend/Recommend",
 			"style": {
 				"navigationBarTitleText": "特惠推荐"
+			}
+		},
+		{
+			"path": "pages/goodsDetail/goodsDetail",
+			"style": {
+				"navigationBarTitleText": "商品详情"
+			}
+		},
+		{
+			"path": "pages/cart/cart2/cart2",
+			"style": {
+				"navigationBarTitleText": "购物车"
+			}
+		},
+		{
+			"path": "pages/search/search",
+			"style": {
+				"navigationBarTitleText": "搜索"
+			}
+		},
+		{
+			"path": "pages/search/searchDetail/searchDetail",
+			"style": {
+				"navigationBarTitleText": "搜索"
 			}
 		}
 	],
@@ -84,5 +110,76 @@
 				"text": "我的"
 			}
 		]
+	},
+	// 分包加载配置
+	"subPackages": [
+		{
+			// 子包的根目录
+			"root": "pagesMember",
+			// 子包由哪些页面组成，参数同 pages
+			"pages": [
+				{
+					"path": "setting/setting",
+					"style": {
+						"navigationBarTitleText": "设置"
+					}
+				},
+				{
+					"path": "userInfo/userInfo",
+					"style": {
+						"navigationBarTitleText": "个人信息",
+						"navigationStyle": "custom",
+						"navigationBarTextStyle": "white"
+					}
+				},
+				{
+					"path": "manageAdress/manageAdress",
+					"style": {
+						"navigationBarTitleText": "地址管理"
+					}
+				},
+				{
+					"path": "changeAdress/changeAdress",
+					"style": {
+						"navigationBarTitleText": "changeAdress"
+					}
+				}
+			]
+		},
+		{
+			"root": "pagesOrder",
+			"pages": [
+				{
+					"path": "writeOrder/writeOrder",
+					"style": {
+						"navigationBarTitleText": "填写订单"
+					}
+				},
+				{
+					"path": "orderDetail/orderDetail",
+					"style": {
+						"navigationBarTitleText": "订单详情",
+						"navigationStyle": "custom"
+					}
+				},
+				{
+					"path": "orderClassify/orderClassify",
+					"style": {
+						"navigationBarTitleText": "订单列表"
+					}
+				}
+			]
+		}
+	],
+	// 分包预下载规则
+	"preloadRule": {
+		// 页面路径
+		"pages/user/user": {
+			"network": "all",
+			// 进入页面后预下载分包的
+			"packages": [
+				"pagesMember"
+			]
+		}
 	}
 }

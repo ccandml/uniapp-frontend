@@ -1,16 +1,16 @@
 <template>
   <view class="category">
     <view class="item" v-for="item in list" :key="item.id">
-      <navigator class="img" url="/pages/" open-type="navigate" hover-class="navigator-hover">
+      <view class="img">
         <image :src="item.icon" mode="aspectFill" />
-      </navigator>
+      </view>
       <view class="text">{{ item.name }}</view>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import type { CategoryList } from '@/pages/types/home'
+import type { CategoryList } from '@/types/home'
 import { ref } from 'vue'
 
 defineProps<{ list: CategoryList[] }>()

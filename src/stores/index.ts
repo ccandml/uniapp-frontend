@@ -9,3 +9,5 @@ export default pinia
 
 // 导出全部模块
 export * from './modules/member'
+export * from './modules/history'
+export * from './modules/address'

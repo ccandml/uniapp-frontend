@@ -1,6 +1,9 @@
 <script setup>
 const { safeAreaInsets } = uni.getSystemInfoSync()
-// console.log(safeAreaInsets)
+
+const goSearch = () => {
+  uni.navigateTo({ url: '/pages/search/search' })
+}
 </script>
 
 <template>
@@ -9,7 +12,7 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
       <image src="@/static/images/logo.png" mode="aspectFit" />
       <text>新鲜 · 亲民 · 快捷</text>
     </view>
-    <view class="search">
+    <view class="search" @click="goSearch">
       <view class="left">
         <uni-icons type="search" size="20" color="white"></uni-icons>
         <text>搜索商品</text>

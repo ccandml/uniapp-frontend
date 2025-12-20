@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import type { BannerList } from '../types/home'
-import { getBannerAPI } from '@/service/home'
+import type { BannerList } from '@/types/home'
 
 /* import type { PropType } from 'vue'
 defineProps({
@@ -22,9 +21,9 @@ const onChange: UniHelper.SwiperOnChange = (e) => {
   <view class="banner">
     <swiper autoplay circular @change="onChange">
       <swiper-item v-for="item in list" :key="item.id">
-        <navigator class="img" url="" open-type="navigate" hover-class="navigator-hover">
+        <view class="img" open-type="navigate" hover-class="navigator-hover">
           <image :src="item.imgUrl" mode="aspectFill" />
-        </navigator>
+        </view>
       </swiper-item>
     </swiper>
     <!-- 轮播点 -->

@@ -1,19 +1,17 @@
 <script setup lang="ts">
 import { getGuessAPI } from '@/service/home'
-import { onMounted, ref } from 'vue'
-import type { GuessList } from '../types/home'
-import type { PagesRequest } from '../types/global'
+import { ref } from 'vue'
+import type { GuessList } from '@/types/home'
+import type { PagesRequest } from '@/types/global'
+import { onLoad } from '@dcloudio/uni-app'
+import { getSearchListAPI } from '@/service/search'
 
 const data = ref<PagesRequest>({
   page: 1,
   pageSize: 10,
 })
-// 重置状态
-const resetData = () => {
-  data.value.page = 1
-  isFinish.value = false
-  guessList.value = []
-}
+// 没写完  接口问题
+
 // 请求状态
 const isFinish = ref(false)
 const guessList = ref<GuessList[]>([])
@@ -33,36 +31,34 @@ const getGuessList = async () => {
   }
 }
 
-// 暴露请求方法
-defineExpose({
-  getGuessList,
-  resetData,
-})
-
-onMounted(() => {
-  getGuessList()
+onLoad(async () => {
+  const res = await getSearchListAPI({
+    page: 1,
+    pageSize: 10,
+    keyword: '橘子',
+  })
+  console.log(res)
 })
 </script>
 
 <template>
   <view class="guess">
-    <view class="top">
-      <image src="../../static/images/bubble.png" mode="aspectFill" />
-      猜你喜欢
-      <image src="../../static/images/bubble.png" mode="aspectFill" />
-    </view>
     <view class="content">
       <navigator
-        class="item"
+        class="navigator"
         v-for="item in guessList"
         :key="item.id"
         url="/pages/"
         open-type="navigate"
         hover-class="navigator-hover"
       >
-        <image :src="item.picture" mode="aspectFill" />
-        <view class="text">{{ item.name }}</view>
-        <view class="monney">￥{{ item.price }}</view>
+        <view class="a">
+          <image :src="item.picture" mode="aspectFill" />
+          <view class="text">
+            <view>{{ item.name }}</view>
+            <view class="monney">￥{{ item.price }}</view>
+          </view>
+        </view>
       </navigator>
     </view>
     <!-- 加载中。。。 -->
@@ -76,36 +72,35 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .guess {
-  width: 95vw;
+  width: 100%;
   margin: 0 auto;
-  .top {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 35rpx auto;
-    image {
-      width: 30rpx;
-      height: 30rpx;
-      margin: 0 10rpx;
-    }
-  }
   .content {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15rpx;
-    .item {
+    .navigator {
       background-color: #fff;
       border-radius: 15rpx;
       padding: 20rpx;
-      image {
-        width: 310rpx;
-        height: 310rpx;
-        display: block;
-        border-radius: 15rpx;
-      }
-
-      .monney {
-        color: rgb(212, 55, 55);
+      .a {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        image {
+          width: 310rpx;
+          height: 310rpx;
+          display: block;
+          border-radius: 15rpx;
+        }
+        .text {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+          .monney {
+            color: rgb(212, 55, 55);
+          }
+        }
       }
     }
   }
