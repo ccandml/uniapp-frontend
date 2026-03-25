@@ -35,5 +35,6 @@ export type GuessList = {
   price: number
   picture: string
   discount: number
+  /** 销量 */
   orderNum: number
 }

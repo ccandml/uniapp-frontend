@@ -1,10 +1,11 @@
 import { useMemberStore } from '@/stores'
 
 const BASE_URL = 'https://pcapi-xiaotuxian-front-devtest.itheima.net'
+// const BASE_URL = 'http://localhost:3000/cyx/v1'
 const httpInterceptor = {
   // 请求前拦截
   invoke(options: UniApp.RequestOptions) {
-    // 如果不是https开头就加上基地址
+    // 如果不是http开头就加上基地址
     if (!options.url.startsWith('http')) {
       options.url = BASE_URL + options.url
     }
@@ -21,6 +22,9 @@ const httpInterceptor = {
     if (token) {
       options.header.Authorization = token
     }
+
+    console.log('最终请求地址:', options.url)
+    console.log('最终请求头:', options.header)
   },
 }
 

@@ -28,7 +28,7 @@ export const getHomeHotAPI = () => {
 // 获取猜你喜欢数据
 export const getGuessAPI = (data: PagesRequest) => {
   return http<PagesResult<GuessList[]>>({
-    url: '/home/goods/guessLike',
+    url: 'http://localhost:3000/cyx/v1/products/guessLike',
     data,
   })
 }

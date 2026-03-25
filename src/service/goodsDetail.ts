@@ -3,7 +3,7 @@ import { http } from '@/utils/request'
 
 export const getGoodsDetailAPI = (id: string) => {
   return http<GoodsResult>({
-    url: '/goods',
+    url: 'http://localhost:3000/cyx/v1/products/goodsDetail',
     data: {
       id,
     },

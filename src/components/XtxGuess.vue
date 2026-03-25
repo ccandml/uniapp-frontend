@@ -22,11 +22,12 @@ const getGuessList = async () => {
   if (isFinish.value) {
     return
   }
+
   const res = await getGuessAPI(data.value)
+  console.log(res)
 
   guessList.value = [...guessList.value, ...res.result.items]
   data.value.page++
-  console.log(res)
   // 到底了
   if (res.result.items.length < data.value.pageSize) {
     isFinish.value = true
