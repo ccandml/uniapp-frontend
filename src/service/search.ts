@@ -4,11 +4,8 @@ import { http } from '@/utils/request'
 // 搜索
 export const getSearchListAPI = (data: SearchParams) => {
   return http({
-    url: '/search/all',
-    method: 'POST',
+    url: 'http://localhost:3000/cyx/v1/products/search',
+    method: 'GET',
     data,
-    header: {
-      'Content-Type': 'application/json',
-    },
   })
 }

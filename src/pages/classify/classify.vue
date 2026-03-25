@@ -1,22 +1,50 @@
 <script setup lang="ts">
 import { getClassifyAPI } from '@/service/classify'
+import { useClassifyStore } from '@/stores'
 import type { ClassifyData } from '@/types/classify'
-import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+import { computed, ref } from 'vue'
 
 const activeIndex = ref(0)
 const classifyData = ref<ClassifyData[]>()
+const classifyStore = useClassifyStore()
+// 顶部搜索词跟随当前一级分类动态变化。
+const searchKeyword = computed(() => classifyData.value?.[activeIndex.value]?.name || '搜索商品')
+
+const applyActiveById = (id: string) => {
+  // 根据分类 id 同步左侧高亮索引，从而驱动右侧展示对应分类数据。
+  if (!id || !classifyData.value?.length) return
+  const index = classifyData.value.findIndex((item) => item.id === id)
+  if (index !== -1) {
+    activeIndex.value = index
+  }
+}
+
 const getClassify = async () => {
   const res = await getClassifyAPI()
-  console.log(res)
   classifyData.value = res.result
+  applyActiveById(classifyStore.currentClassifyId)
 }
 // 左侧点击事件
 const onChange = (index: number) => {
   activeIndex.value = index
+  const current = classifyData.value?.[index]
+  if (current) {
+    // 一级分类手动点击后，覆盖首页导航写入的 id，作为后续默认展示。
+    classifyStore.setCurrentClassifyId(current.id)
+  }
 }
-onLoad(() => {
+
+onLoad((options) => {
+  // 非 tabBar 跳转场景兼容：若 url 带 id，则同步写入 pinia。
+  const id = (options?.id as string) || ''
+  if (id) classifyStore.setCurrentClassifyId(id)
   getClassify()
+})
+
+onShow(() => {
+  // 回到分类页时按 pinia 里最后一次一级分类 id 恢复展示。
+  applyActiveById(classifyStore.currentClassifyId)
 })
 </script>
 
@@ -24,7 +52,7 @@ onLoad(() => {
   <view class="classify">
     <view class="search">
       <uni-icons type="search" size="20" color="#ccc"></uni-icons>
-      <text class="text">切尔西</text>
+      <text class="text">{{ searchKeyword }}</text>
     </view>
     <view class="contain">
       <view class="left">
@@ -42,11 +70,11 @@ onLoad(() => {
         <view class="sub" v-for="item in classifyData?.[activeIndex]?.children" :key="item.id">
           <view class="top">
             <view class="title">{{ item.name }}</view>
-            <navigator url="/pages/" open-type="navigate">
+            <!-- <navigator url="/pages/" open-type="navigate">
               <view class="more"
                 >全部 <uni-icons type="right" size="25" color="#ccc"></uni-icons
               ></view>
-            </navigator>
+            </navigator> -->
           </view>
           <view class="content">
             <navigator

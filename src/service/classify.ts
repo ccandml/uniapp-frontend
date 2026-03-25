@@ -3,6 +3,6 @@ import { http } from '@/utils/request'
 
 export const getClassifyAPI = () => {
   return http<ClassifyData[]>({
-    url: '/category/top',
+    url: 'http://localhost:3000/cyx/v1/categories',
   })
 }

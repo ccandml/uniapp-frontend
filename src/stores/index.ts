@@ -11,3 +11,4 @@ export default pinia
 export * from './modules/member'
 export * from './modules/history'
 export * from './modules/address'
+export * from './modules/classify'

@@ -1,7 +1,7 @@
 import type { GoodsItems, PagesRequest, PagesResult } from './global'
 
 // 发送请求类型
-export type HotRquest = { subType?: string } & PagesRequest
+export type HotRquest = { type?: string } & PagesRequest
 
 // 接收数据类型
 export type HotPanelData = {

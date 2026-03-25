@@ -42,7 +42,7 @@ const logout = () => {
     </view>
     <view class="card">
       <view class="item">
-        <view class="left">关于小兔鲜儿</view>
+        <view class="left">关于我们</view>
         <uni-icons type="right" size="25"></uni-icons>
       </view>
     </view>

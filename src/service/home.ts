@@ -3,25 +3,21 @@ import type { BannerList, CategoryList, GuessList, HotList } from '@/types/home'
 import { http } from '@/utils/request'
 
 // 获取轮播图
-export const getBannerAPI = (distributionSite = 1) => {
-  // distributionSite=1首页，distributionSite=2商品页
+export const getBannerAPI = () => {
   return http<BannerList[]>({
-    url: '/home/banner',
-    data: {
-      distributionSite,
-    },
+    url: 'http://localhost:3000/cyx/v1/banner',
   })
 }
 // 获取分类
 export const getHomeCategoryAPI = () => {
   return http<CategoryList[]>({
-    url: '/home/category/mutli',
+    url: 'http://localhost:3000/cyx/v1/categories/navs',
   })
 }
 // 获取热门推荐
 export const getHomeHotAPI = () => {
   return http<HotList[]>({
-    url: '/home/hot/mutli',
+    url: 'http://localhost:3000/cyx/v1/recommend/list',
   })
 }
 

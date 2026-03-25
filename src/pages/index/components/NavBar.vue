@@ -9,7 +9,7 @@ const goSearch = () => {
 <template>
   <view class="navbar" :style="{ 'padding-top': safeAreaInsets?.top + 'px' }">
     <view class="top">
-      <image src="@/static/images/logo.png" mode="aspectFit" />
+      <h2>晨曦优选</h2>
       <text>新鲜 · 亲民 · 快捷</text>
     </view>
     <view class="search" @click="goSearch">
@@ -32,6 +32,14 @@ const goSearch = () => {
     padding: 20rpx;
     display: flex;
     align-items: center;
+    h2 {
+      color: #fff;
+      font-family: 'HuaWen XingKai', 'Microsoft YaHei', serif;
+      font-weight: 550;
+      font-size: 40rpx;
+      margin: 0 20rpx;
+      letter-spacing: 2rpx;
+    }
     image {
       width: 166rpx;
       height: 39rpx;

@@ -4,19 +4,14 @@ import { getHotDetailAPI } from '@/service/hot'
 import type { HotPanelData, HotRquest } from '../../types/hot'
 import { onLoad } from '@dcloudio/uni-app'
 import type { GoodsItems, PagesResult } from '../../types/global'
-// 四个请求
-const MapRequestData = [
-  { type: '1', url: '/hot/preference' },
-  { type: '2', url: '/hot/inVogue' },
-  { type: '3', url: '/hot/oneStop' },
-  { type: '4', url: '/hot/new' },
-]
+
+// 四个不同请求
 const query = ref<HotRquest>({
   page: 1,
   pageSize: 10,
+  type: '',
 })
 const activeIndex = ref<number>(0)
-const props = defineProps<{ type: string }>()
 const detailList = ref<HotPanelData>()
 // 选择展示的数据
 const subTypesList = ref<
@@ -29,42 +24,68 @@ const subTypesList = ref<
 >()
 // 请求数据
 const getHotData = async () => {
-  const res = await getHotDetailAPI(
-    MapRequestData.find((item) => item.type === props.type)!.url,
-    query.value,
-  )
-  console.log(res)
-  detailList.value = res.result
-  subTypesList.value = res.result.subTypes
-  // navbar
-  uni.setNavigationBarTitle({ title: detailList.value.title })
+  try {
+    const res = await getHotDetailAPI(query.value)
+    console.log(res)
+    detailList.value = res.result
+    subTypesList.value = (res.result.subTypes || []).map((item) => ({
+      ...item,
+      isFinish: item.goodsItems.page >= item.goodsItems.pages,
+    }))
+    // navbar
+    uni.setNavigationBarTitle({ title: detailList.value.title || '特惠推荐' })
+  } catch (error) {
+    console.error('getHotData error:', error)
+    uni.showToast({ icon: 'none', title: '数据加载失败' })
+  }
 }
 
 // 触底加载
 const onScrolltolower = async () => {
-  if (
-    subTypesList.value![activeIndex.value]!.goodsItems.page <
-    subTypesList.value![activeIndex.value]!.goodsItems.pages
-  ) {
-    subTypesList.value![activeIndex.value]!.goodsItems.page++
-  } else {
-    subTypesList.value![activeIndex.value]!.isFinish = true
+  if (!subTypesList.value?.length) return
+
+  const hasMore = subTypesList.value.some((item) => item.goodsItems.page < item.goodsItems.pages)
+
+  if (!hasMore) {
+    subTypesList.value = subTypesList.value.map((item) => ({
+      ...item,
+      isFinish: true,
+    }))
     return uni.showToast({ icon: 'none', title: '已经到底了~' })
   }
-  // console.log(subTypesList.value![activeIndex.value]?.id)
-  // 发送当前tab的id的请求
-  const res = await getHotDetailAPI(MapRequestData.find((item) => item.type === props.type)!.url, {
-    page: subTypesList.value![activeIndex.value]!.goodsItems.page,
-    pageSize: subTypesList.value![activeIndex.value]!.goodsItems.pageSize,
-    subType: subTypesList.value![activeIndex.value]!.id,
-  })
-  console.log(res)
-  subTypesList.value![activeIndex.value]!.goodsItems.items.push(
-    ...res.result.subTypes[activeIndex.value]!.goodsItems.items,
-  )
+
+  // 后端每次都会返回所有 subTypes 的同一页数据，这里统一翻页并合并
+  try {
+    query.value.page++
+    const res = await getHotDetailAPI(query.value)
+    console.log(res)
+
+    const nextSubTypes = res.result.subTypes || []
+    subTypesList.value = subTypesList.value.map((item, index) => {
+      const nextItem = nextSubTypes[index]
+      if (!nextItem) return item
+
+      return {
+        ...item,
+        goodsItems: {
+          ...item.goodsItems,
+          page: nextItem.goodsItems.page,
+          pages: nextItem.goodsItems.pages,
+          items: [...item.goodsItems.items, ...nextItem.goodsItems.items],
+        },
+        isFinish: nextItem.goodsItems.page >= nextItem.goodsItems.pages,
+      }
+    })
+  } catch (error) {
+    // 回滚页码，避免下一次请求跳页
+    query.value.page = Math.max(1, query.value.page - 1)
+    console.error('onScrolltolower error:', error)
+    uni.showToast({ icon: 'none', title: '加载失败，请重试' })
+  }
 }
 
-onLoad(() => {
+onLoad((options) => {
+  query.value.type = (options?.type as string) || ''
   getHotData()
 })
 // 点击事件
@@ -98,23 +119,23 @@ onLoad(() => {
       <view class="content">
         <navigator
           class="navigator"
-          v-for="item in subTypesList![activeIndex]?.goodsItems.items"
-          :key="item.id"
-          :url="`/pages/goodsDetail/goodsDetail?id=${item.id}`"
+          v-for="goods in item.goodsItems.items"
+          :key="goods.id"
+          :url="`/pages/goodsDetail/goodsDetail?id=${goods.id}`"
           open-type="navigate"
           hover-class="navigator-hover"
         >
           <view class="item">
-            <image :src="item.picture" mode="aspectFill" />
+            <image :src="goods.picture" mode="aspectFill" />
             <view class="bottom">
-              <view class="text">{{ item.name }}</view>
-              <view class="monney">￥{{ item.price }}</view>
+              <view class="text">{{ goods.name }}</view>
+              <view class="monney">￥{{ goods.price }}</view>
             </view>
           </view>
         </navigator>
       </view>
       <!-- 加载中。。。 -->
-      <view v-if="!subTypesList?.[activeIndex]!.isFinish" class="loading">
+      <view v-if="!item.isFinish" class="loading">
         <uni-icons type="spinner-cycle" size="25"></uni-icons>
         加载中...
       </view>
