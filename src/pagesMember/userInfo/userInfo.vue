@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { getUserInfoAPI, updateUserInfoAPI, uploadImgAPI } from '@/service/userInfo'
+import { getUserInfoAPI, updateUserInfoAPI } from '@/service/userInfo'
 import { useMemberStore } from '@/stores'
+import CityPicker from '@/uni_modules/piaoyi-cityPicker/components/piaoyi-cityPicker/piaoyi-cityPicker.vue'
 import type { Gender, ProfileDetail, RequestProfile } from '@/types/member'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
@@ -9,16 +10,18 @@ const memberStore = useMemberStore()
 // 用户信息
 const userInfo = ref<ProfileDetail>()
 const requestProfile = ref<RequestProfile>({
-  nickname: '',
+  username: '',
   gender: '未知',
   birthday: '',
   profession: '',
-  cityCode: '',
-  provinceCode: '',
-  countyCode: '',
+  fullLocation: '',
 })
+// 城市编码仅用于城市选择器默认值回显，不提交给资料更新接口
+const selectedLocationCode = ref('')
 const goBack = () => {
-  uni.navigateBack()
+  uni.switchTab({
+    url: '/pages/user/user',
+  })
 }
 // 头像预览
 const onPreview = () => {
@@ -27,39 +30,43 @@ const onPreview = () => {
   })
 }
 // 修改头像
-const onAvatorChange = () => {
-  uni.chooseImage({
-    count: 1,
-    success: async (res) => {
-      console.log(res)
-      // H5端使用formdata上传数据请求接口
-      // #ifdef H5
-      const formData = new FormData()
-      formData.append('file', (res.tempFiles as File[])[0]!)
-      const result = await uploadImgAPI(formData)
-      console.log(result)
-      // #endif
+const onAvatorChange = async () => {
+  const avatar = userInfo.value?.avatar || ''
+  const { cancel, confirm, content } = await uni.showModal({
+    title: '修改头像',
+    editable: true,
+    placeholderText: '请输入头像图片访问地址',
+    content: avatar,
+  })
+  if (cancel || !confirm) return
+  const avatarUrl = (content || '').trim()
+  if (!avatarUrl) {
+    uni.showToast({
+      title: '头像地址不能为空',
+      icon: 'none',
+    })
+    return
+  }
+  const urlPattern = /^https?:\/\/\S+$/i
+  if (!urlPattern.test(avatarUrl)) {
+    uni.showToast({
+      title: '请输入 http/https 图片地址',
+      icon: 'none',
+    })
+    return
+  }
 
-      // 因为，浏览器使用uni.uploadFile其实是XMLHttpRequest 请求，没有实现代理
-
-      // 小程序端直接使用uni.uploadFile上传数据
-      // #ifndef H5
-      uni.uploadFile({
-        url: '/member/profile/avatar',
-        fileType: 'image',
-        filePath: res.tempFilePaths[0],
-        name: 'file',
-        success: (res) => {
-          console.log(res)
-        },
-        fail: (error) => {
-          console.log(error)
-          uni.showToast({ icon: 'none', title: '意外的错误' })
-        },
-      })
-      // #endif
-    },
-    fail: (error) => {},
+  // 头像更新独立于资料表单，直接单字段提交
+  await updateUserInfoAPI({ avatar: avatarUrl })
+  if (userInfo.value) {
+    userInfo.value.avatar = avatarUrl
+  }
+  if (memberStore.profile) {
+    memberStore.profile.avatar = avatarUrl
+  }
+  uni.showToast({
+    title: '头像更新成功',
+    icon: 'success',
   })
 }
 // 性别修改
@@ -73,14 +80,22 @@ const onDateChange: UniHelper.DatePickerOnChange = (e) => {
   requestProfile.value.birthday = e.detail.value
 }
 // 城市修改
-const onRegionChange: UniHelper.RegionPickerOnChange = (e) => {
-  console.log(e.detail.value)
-  // 展示
-  userInfo.value!.fullLocation = e.detail.value.join(' ')
-  // 请求
-  requestProfile.value.provinceCode = e.detail.code![0]
-  requestProfile.value.cityCode = e.detail.code![1]
-  requestProfile.value.countyCode = e.detail.code![2]
+const cityPickerVisible = ref(false)
+const openMockPicker = () => {
+  cityPickerVisible.value = true
+}
+const onCityPickerConfirm = (val: {
+  code: string
+  provinceName: string
+  cityName: string
+  areaName: string
+}) => {
+  requestProfile.value.fullLocation = `${val.provinceName} ${val.cityName} ${val.areaName}`
+  selectedLocationCode.value = val.code
+  cityPickerVisible.value = false
+}
+const onCityPickerCancel = () => {
+  cityPickerVisible.value = false
 }
 
 // 提交修改
@@ -89,7 +104,7 @@ const submit = async () => {
   console.log(res)
   console.log(requestProfile.value)
   // 修改pinia数据同步
-  memberStore.profile!.nickname = requestProfile.value.nickname
+  memberStore.profile!.username = requestProfile.value.username
   uni.showToast({
     title: '修改成功！',
     icon: 'success',
@@ -103,10 +118,15 @@ onLoad(async () => {
   const res = await getUserInfoAPI()
   console.log(res)
   userInfo.value = res.result
-  requestProfile.value.nickname = userInfo.value.nickname
+  const profileWithCode = res.result as ProfileDetail & {
+    locationCode?: string
+  }
+  requestProfile.value.username = userInfo.value.username
   requestProfile.value.gender = userInfo.value.gender
   requestProfile.value.birthday = userInfo.value.birthday
   requestProfile.value.profession = userInfo.value.profession
+  requestProfile.value.fullLocation = userInfo.value.fullLocation || ''
+  selectedLocationCode.value = profileWithCode.locationCode || ''
 })
 </script>
 
@@ -134,11 +154,11 @@ onLoad(async () => {
     <view class="body">
       <view class="item">
         <view class="left">账号</view>
-        <view class="right">{{ userInfo?.account }}</view>
+        <view class="right">用户{{ userInfo?.id }}</view>
       </view>
       <view class="item">
         <view class="left">昵称</view>
-        <input class="right" type="text" v-model="requestProfile!.nickname" />
+        <input class="right" type="text" v-model="requestProfile!.username" />
       </view>
       <view class="item">
         <view class="left">性别</view>
@@ -166,9 +186,9 @@ onLoad(async () => {
       <view class="item">
         <view class="left">城市</view>
         <view class="right">
-          <picker mode="region" @change="onRegionChange" :value="userInfo?.fullLocation">
-            <view class="value">{{ userInfo?.fullLocation || '选择城市' }}</view>
-          </picker>
+          <view class="value region-trigger" @click="openMockPicker">
+            {{ requestProfile.fullLocation || '选择城市' }}
+          </view>
         </view>
       </view>
       <view class="item">
@@ -177,6 +197,14 @@ onLoad(async () => {
       </view>
     </view>
     <view @click="submit" class="btn">保存</view>
+    <CityPicker
+      :column="3"
+      :default-value="selectedLocationCode"
+      :mask-close-able="true"
+      :visible="cityPickerVisible"
+      @confirm="onCityPickerConfirm"
+      @cancel="onCityPickerCancel"
+    />
   </view>
 </template>
 
@@ -249,6 +277,11 @@ page {
         .uni-list-cell {
           width: fit-content;
           margin-right: 20rpx;
+        }
+
+        .region-trigger {
+          color: #333;
+          padding: 8rpx 0;
         }
       }
     }

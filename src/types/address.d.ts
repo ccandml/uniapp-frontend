@@ -4,12 +4,8 @@ export type AddressParams = {
   receiver: string
   /** 联系方式 */
   contact: string
-  /** 省份编码 */
-  provinceCode: string
-  /** 城市编码 */
-  cityCode: string
-  /** 区/县编码 */
-  countyCode: string
+  /** 地区编码（单编码） */
+  locationCode: string
   /** 详细地址 */
   address: string
   /** 默认地址，1为是，0为否 */
@@ -22,12 +18,8 @@ export type AddressItem = {
   receiver: string
   /** 联系方式 */
   contact: string
-  /** 省份编码 */
-  provinceCode: string
-  /** 城市编码 */
-  cityCode: string
-  /** 区/县编码 */
-  countyCode: string
+  /** 地区编码（单编码） */
+  locationCode: string
   /** 详细地址 */
   address: string
   /** 默认地址，1为是，0为否 */

@@ -1,24 +1,16 @@
-import type { ProfileDetail, RequestProfile } from '@/types/member'
+import type { ProfileDetail, RequestUpdateProfile } from '@/types/member'
 import { http } from '@/utils/request'
 // 获取信息
 export const getUserInfoAPI = () => {
   return http<ProfileDetail>({
-    url: '/member/profile',
+    url: 'http://localhost:3000/cyx/v1/user/profile',
   })
 }
 // 更新数据
-export const updateUserInfoAPI = (data: RequestProfile) => {
+export const updateUserInfoAPI = (data: RequestUpdateProfile) => {
   return http<ProfileDetail>({
-    url: '/member/profile',
+    url: 'http://localhost:3000/cyx/v1/user/profile',
     method: 'PUT',
-    data,
-  })
-}
-// 头像上传H5端(小程序用uni.upload)
-export const uploadImgAPI = (data: FormData) => {
-  return http({
-    url: '/member/profile/avatar',
-    method: 'POST',
     data,
   })
 }

@@ -18,9 +18,9 @@ const httpInterceptor = {
     }
     // 4. 添加 token 请求头标识
     const memberStore = useMemberStore()
-    const token = memberStore.profile?.token
+    const token = memberStore.profile?.access_token
     if (token) {
-      options.header.Authorization = token
+      options.header.Authorization = 'Bearer ' + token
     }
 
     console.log('最终请求地址:', options.url)
@@ -46,7 +46,7 @@ uni.addInterceptor('uploadFile', httpInterceptor)
  */
 interface Data<T> {
   code: string
-  msg: string
+  message: string
   result: T
 }
 export const http = <T>(options: UniApp.RequestOptions) => {
@@ -65,7 +65,7 @@ export const http = <T>(options: UniApp.RequestOptions) => {
         } else {
           uni.showToast({
             icon: 'none',
-            title: (res.data as Data<T>).msg || '请求错误',
+            title: (res.data as Data<T>).message || '请求错误',
           })
           reject(res)
         }

@@ -28,13 +28,11 @@ export const wxLoginAPI = (wxData: wxData) => {
   })
 }
 
-// 内测登录
+// 测试登录
 export const buildLoginAPI = () => {
   return http<MemberData>({
     method: 'POST',
-    url: '/login/wxMin/simple',
-    data: {
-      phoneNumber: '13558351712',
-    },
+    url: 'http://localhost:3000/cyx/v1/auth/signin',
+    data: { username: 'testuser', password: 'password123' },
   })
 }

@@ -122,7 +122,7 @@ const loginSuccess = () => {
       </view>
     </view>
 
-    <view class="contract">登录/注册即视为你同意《服务条款》和《小兔鲜儿隐私协议》</view>
+    <view class="contract">登录/注册即视为你同意《服务条款》和《晨曦优选隐私协议》</view>
   </view>
 </template>
 

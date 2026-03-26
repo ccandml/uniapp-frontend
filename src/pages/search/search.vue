@@ -40,7 +40,13 @@ onBackPress((options) => {
 <template>
   <view class="search">
     <view class="top">
-      <uni-search-bar v-model="searchInput" @confirm="onSearch" radius="20" :focus="true">
+      <uni-search-bar
+        v-model="searchInput"
+        @confirm="onSearch"
+        radius="20"
+        :focus="true"
+        maxlength="20"
+      >
       </uni-search-bar>
     </view>
     <view class="box"></view>
@@ -66,12 +72,13 @@ onBackPress((options) => {
         <view class="left">搜索发现</view>
       </view>
       <view class="content">
-        <view class="item" @click="goSearch('脑白金')">脑白金</view>
-        <view class="item" @click="goSearch('鼠标')">鼠标</view>
-        <view class="item" @click="goSearch('橘子')">橘子</view>
-        <view class="item" @click="goSearch('苹果')">苹果</view>
-        <view class="item" @click="goSearch('葡萄')">葡萄</view>
-        <view class="item" @click="goSearch('香蕉')">香蕉</view>
+        <view class="item" @click="goSearch('宝宝')">宝宝</view>
+        <view class="item" @click="goSearch('鞋')">鞋</view>
+        <view class="item" @click="goSearch('健身')">健身</view>
+        <view class="item" @click="goSearch('酒')">酒</view>
+        <view class="item" @click="goSearch('运动')">运动</view>
+        <view class="item" @click="goSearch('切尔西')">切尔西</view>
+        <view class="item" @click="goSearch('衣')">衣</view>
       </view>
     </view>
   </view>

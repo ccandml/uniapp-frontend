@@ -3,18 +3,14 @@ export type UserBase = {
   id: number
   /** 头像  */
   avatar: string
-  /** 账户名  */
-  account: string
   /** 昵称 */
-  nickname?: string
+  username: string
 }
 
 /** pinia的用户类型 */
 export type MemberData = UserBase & {
-  /** 手机号 */
-  mobile: string
   /** 登录凭证 */
-  token: string
+  access_token: string
 }
 
 /** 个人信息 用户详情信息 */
@@ -25,6 +21,8 @@ export type ProfileDetail = UserBase & {
   birthday?: string
   /** 省市区 */
   fullLocation?: string
+  /** 地区编码（单编码） */
+  locationCode?: string
   /** 职业 */
   profession?: string
 }
@@ -34,9 +32,8 @@ export type Gender = '女' | '男' | '未知'
 // 请求参数类型
 export type RequestProfile = Pick<
   ProfileDetail,
-  'nickname' | 'gender' | 'birthday' | 'profession'
-> & {
-  provinceCode: string
-  cityCode: string
-  countyCode: string
-}
+  'username' | 'gender' | 'birthday' | 'profession' | 'fullLocation'
+>
+
+// 用户资料更新请求体，支持局部更新（如仅更新头像）
+export type RequestUpdateProfile = Partial<RequestProfile & Pick<ProfileDetail, 'avatar'>>

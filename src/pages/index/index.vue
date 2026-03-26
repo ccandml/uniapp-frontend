@@ -40,9 +40,17 @@ const onScrollBottom = () => {
   XtxGuessRef.value?.getGuessList()
 }
 
+// 滚动位置（用于回到顶部）
+const scrollTop = ref(0)
+const onPageScroll = (e: any) => {
+  scrollTop.value = e.detail.scrollTop
+}
+
 // 下拉刷新
 const isTrigger = ref(false) // 是否在刷新？
+const refreshThreshold = 120 // 下拉触发距离，值越大下拉幅度越大
 const onRefresh = async () => {
+  if (isTrigger.value) return
   isTrigger.value = true
   XtxGuessRef.value?.resetData() //重置猜你喜欢数据状态
   await Promise.allSettled([
@@ -52,6 +60,12 @@ const onRefresh = async () => {
     getHotList(),
   ])
   isTrigger.value = false
+}
+
+// 回到顶部并触发刷新
+const backTopAndRefresh = async () => {
+  scrollTop.value = 0
+  await onRefresh()
 }
 
 const isLoading = ref(false)
@@ -67,9 +81,13 @@ onLoad(async () => {
     <!-- 自定义头部 -->
     <NavBar></NavBar>
     <scroll-view
+      @scroll="onPageScroll"
       @scrolltolower="onScrollBottom"
       refresher-enabled
+      :refresher-threshold="refreshThreshold"
       :refresher-triggered="isTrigger"
+      :scroll-top="scrollTop"
+      scroll-with-animation
       @refresherrefresh="onRefresh"
       scroll-y
       class="scroll"
@@ -88,6 +106,8 @@ onLoad(async () => {
         <XtxGuess ref="XtxGuessRef"></XtxGuess>
       </template>
     </scroll-view>
+
+    <view class="back-top" @click="backTopAndRefresh">↑</view>
   </view>
 </template>
 
@@ -110,6 +130,22 @@ page {
   .scroll {
     flex: 1;
     overflow: auto;
+  }
+
+  .back-top {
+    position: fixed;
+    right: 28rpx;
+    bottom: 220rpx;
+    width: 78rpx;
+    height: 78rpx;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);
+    color: #00bf9c;
+    font-size: 38rpx;
+    line-height: 78rpx;
+    text-align: center;
+    z-index: 999;
+    box-shadow: 0 8rpx 18rpx rgba(0, 0, 0, 0.18);
   }
 }
 </style>

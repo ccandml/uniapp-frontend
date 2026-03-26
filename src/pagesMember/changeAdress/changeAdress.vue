@@ -4,6 +4,7 @@ import {
   getMemberAddressDetailAPI,
   updateMemberAddressDetailAPI,
 } from '@/service/address'
+import CityPicker from '@/uni_modules/piaoyi-cityPicker/components/piaoyi-cityPicker/piaoyi-cityPicker.vue'
 import type { AddressParams } from '@/types/address'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
@@ -12,9 +13,7 @@ import { ref } from 'vue'
 const paramsData = ref<AddressParams>({
   receiver: '',
   contact: '',
-  provinceCode: '',
-  cityCode: '',
-  countyCode: '',
+  locationCode: '',
   address: '',
   isDefault: 0,
 })
@@ -36,13 +35,23 @@ const getMemberAddressDetail = async () => {
     fullLocationData.value = fullLocation
   }
 }
-// 修改地区
-const onRegionChange: UniHelper.RegionPickerOnChange = (e) => {
-  console.log(e)
-  paramsData.value.provinceCode = e.detail.code![0]
-  paramsData.value.cityCode = e.detail.code![1]
-  paramsData.value.countyCode = e.detail.code![2]
-  fullLocationData.value = e.detail.value.join(' ')
+// 新选择器返回单个地区编码，直接用于接口提交
+const cityPickerVisible = ref(false)
+const openCityPicker = () => {
+  cityPickerVisible.value = true
+}
+const onCityPickerConfirm = (val: {
+  code: string
+  provinceName: string
+  cityName: string
+  areaName: string
+}) => {
+  paramsData.value.locationCode = val.code
+  fullLocationData.value = `${val.provinceName} ${val.cityName} ${val.areaName}`
+  cityPickerVisible.value = false
+}
+const onCityPickerCancel = () => {
+  cityPickerVisible.value = false
 }
 // 修改默认地址
 const onSwitchChange: UniHelper.SwitchOnChange = (e) => {
@@ -64,7 +73,7 @@ const rules: UniHelper.UniFormsRules = {
       },
     ],
   },
-  provinceCode: {
+  locationCode: {
     rules: [{ required: true, errorMessage: '请选择地址' }],
   },
   address: {
@@ -89,6 +98,7 @@ const submit = async () => {
   setTimeout(() => {
     uni.navigateBack()
   }, 1000)
+  console.log(paramsData.value)
 }
 onLoad(() => {
   getMemberAddressDetail()
@@ -115,17 +125,13 @@ onLoad(() => {
             </view>
           </view>
         </uni-forms-item>
-        <uni-forms-item name="provinceCode">
+        <uni-forms-item name="locationCode">
           <view class="item">
             <view class="left"> 所在地区 </view>
             <view class="right">
-              <picker
-                mode="region"
-                :value="[paramsData.provinceCode, paramsData.cityCode, paramsData.countyCode]"
-                @change="onRegionChange"
-              >
-                <view>{{ fullLocationData || '请选择地址' }}</view>
-              </picker>
+              <view class="region-value" @click="openCityPicker">
+                {{ fullLocationData || '请选择地址' }}
+              </view>
             </view>
           </view>
         </uni-forms-item>
@@ -151,6 +157,14 @@ onLoad(() => {
       </uni-forms>
     </view>
     <view @click="submit" class="btn">保存并使用</view>
+    <CityPicker
+      :column="3"
+      :default-value="paramsData.locationCode"
+      :mask-close-able="true"
+      :visible="cityPickerVisible"
+      @confirm="onCityPickerConfirm"
+      @cancel="onCityPickerCancel"
+    />
   </view>
 </template>
 
@@ -186,6 +200,9 @@ page {
       }
       .left {
         width: 210rpx;
+      }
+      .region-value {
+        min-height: 42rpx;
       }
     }
   }

@@ -10,6 +10,8 @@ export const useMemberStore = defineStore(
     //   保存会员信息
     const setProfile = (val: MemberData) => {
       profile.value = val
+      profile.value.username = val.username
+      profile.value.avatar = val.avatar
     }
     //   清理会员信息
     const clearProfile = () => {

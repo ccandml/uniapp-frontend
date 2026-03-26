@@ -61,7 +61,7 @@ console.log(SystemInfo.safeAreaInsets?.top)
             <image :src="memberStore.profile!.avatar" mode="aspectFill" />
           </view>
           <view class="right">
-            <view class="name">{{ memberStore.profile!.nickname || memberStore.profile!.id }}</view>
+            <view class="name">{{ memberStore.profile.username }}</view>
             <navigator>
               <view class="change">修改昵称和头像</view>
             </navigator>

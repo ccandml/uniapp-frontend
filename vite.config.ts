@@ -5,10 +5,9 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [uni()],
-  base: './', // 资源前缀改为相对
+  base: './',
   resolve: {
     alias: {
-      // 与 tsconfig paths 同步！
       '@': path.resolve(__dirname, 'src'),
     },
   },
