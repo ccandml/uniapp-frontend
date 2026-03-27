@@ -7,13 +7,13 @@ export const getMemberAddressAPI = () => {
     url: 'http://localhost:3000/cyx/v1/user-address/list',
   })
 }
-// 获取地址详情
+// 获取收货地址详情
 export const getMemberAddressDetailAPI = (id: string) => {
   return http<AddressItem>({
     url: `http://localhost:3000/cyx/v1/user-address/${id}`,
   })
 }
-// 修改地址
+// 修改收货地址
 export const updateMemberAddressDetailAPI = (id: string, data: AddressParams) => {
   return http<AddressParams>({
     method: 'PUT',

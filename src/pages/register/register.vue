@@ -1,17 +1,13 @@
 <script lang="ts" setup>
-import { wxLoginAPI, buildLoginAPI, stringLoginAPI } from '@/service/login'
-import { useMemberStore } from '@/stores'
-import { onLoad } from '@dcloudio/uni-app'
+import { registerAPI } from '@/service/register'
 import { ref } from 'vue'
 
-const memberStore = useMemberStore()
-
-// H5端登录
-// #ifdef H5
 const formData = ref({
   username: '',
   password: '',
+  confirmPassword: '',
 })
+
 const form = ref()
 const rules: UniHelper.UniFormsRules = {
   username: {
@@ -34,65 +30,39 @@ const rules: UniHelper.UniFormsRules = {
       },
     ],
   },
+  confirmPassword: {
+    rules: [
+      {
+        required: true,
+        errorMessage: '请再次输入密码',
+      },
+    ],
+  },
 }
-// #endif
 
-// #ifndef H5
-// 微信快捷登录
-let code: string
-onLoad(() => {
-  wx.login({
-    success: (res) => {
-      console.log(res)
-      code = res.code
-    },
-  })
-})
-const onGetPhoneNumber: UniHelper.ButtonOnGetphonenumber = async (res) => {
-  console.log(res)
-  const encryptedData = res.detail.encryptedData!
-  const iv = res.detail.iv!
-  const r = await wxLoginAPI({ code, encryptedData, iv })
-  console.log(r)
-  loginSuccess()
-}
-// #endif
-
-// #ifdef H5
 const onSubmit = async () => {
   await form.value.validate()
-  const res = await stringLoginAPI(formData.value)
-  console.log(res)
-  memberStore.setProfile(res.result)
-  loginSuccess()
-}
-// #endif
+  if (formData.value.password !== formData.value.confirmPassword) {
+    uni.showToast({ icon: 'none', title: '两次密码输入不一致' })
+    return
+  }
 
-// 更多登录
-const simpleLogin = async () => {
-  const res = await buildLoginAPI()
-  console.log(res)
-  memberStore.setProfile(res.result)
-  loginSuccess()
-}
+  await registerAPI({
+    username: formData.value.username,
+    password: formData.value.password,
+  })
 
-const loginSuccess = () => {
-  uni.showToast({ icon: 'success', title: '登陆成功！' })
+  uni.showToast({ icon: 'success', title: '注册成功' })
   setTimeout(() => {
     uni.navigateBack()
-  }, 1000)
-}
-
-const goRegister = () => {
-  uni.navigateTo({ url: '/pages/register/register' })
+  }, 800)
 }
 </script>
 
 <template>
-  <view class="login">
+  <view class="register">
     <image src="../../static//images//logo_icon.png" mode="widthFix" />
 
-    <!-- #ifdef H5 -->
     <uni-forms validate-trigger="blur" ref="form" v-model="formData" :rules="rules">
       <uni-forms-item required name="username">
         <uni-easyinput v-model="formData.username" type="text" placeholder="请输入用户名" />
@@ -100,27 +70,18 @@ const goRegister = () => {
       <uni-forms-item required name="password">
         <uni-easyinput v-model="formData.password" type="password" placeholder="请输入密码" />
       </uni-forms-item>
+      <uni-forms-item required name="confirmPassword">
+        <uni-easyinput
+          v-model="formData.confirmPassword"
+          type="password"
+          placeholder="请再次输入密码"
+        />
+      </uni-forms-item>
     </uni-forms>
-    <view class="button">
-      <view class="showbutton">登录</view>
-      <button @click="onSubmit">登录</button>
-    </view>
-    <view class="register-button" @click="goRegister">去注册</view>
-    <!-- #endif -->
 
-    <!-- #ifndef H5 -->
     <view class="button">
-      <view class="showbutton">快捷登录</view>
-      <button open-type="getPhoneNumber" @getphonenumber="onGetPhoneNumber" @click="onSubmit">
-        登录
-      </button>
-    </view>
-    <!-- #endif -->
-    <view class="moreLogin">
-      --------------其他登录方式--------------
-      <view @click="simpleLogin" class="more">
-        <uni-icons type="contact" size="40" color="#ccc"></uni-icons>
-      </view>
+      <view class="showbutton">注册</view>
+      <button @click="onSubmit">注册</button>
     </view>
 
     <view class="contract">登录/注册即视为你同意《服务条款》和《晨曦优选隐私协议》</view>
@@ -128,11 +89,12 @@ const goRegister = () => {
 </template>
 
 <style lang="scss" scoped>
-.login {
+.register {
   height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+
   image {
     width: 250rpx;
     height: 250rpx;
@@ -142,11 +104,13 @@ const goRegister = () => {
 
   .button {
     position: relative;
+
     button {
       width: 57vw;
       height: 78rpx;
       opacity: 0;
     }
+
     .showbutton {
       background-color: $theme-color;
       width: 60vw;
@@ -162,20 +126,15 @@ const goRegister = () => {
     }
   }
 
-  .register-button {
-    width: fit-content;
-    margin: 36rpx auto 0;
-    color: $theme-color;
-    font-size: 28rpx;
-  }
-  // 表单
   :deep(.uni-forms-item) {
     margin-bottom: 30rpx;
   }
+
   .uni-easyinput {
     width: 85vw;
     margin: 0 auto;
   }
+
   :deep(.uni-easyinput__content) {
     border-radius: 50rpx;
     border: 2rpx solid #e8e8e8;
@@ -183,17 +142,17 @@ const goRegister = () => {
     transition: all 0.3s ease;
     background-color: #f9f9f9;
   }
-  // 边框色
+
   :deep(.uni-easyinput .is-focused) {
     border-color: $theme-color !important;
     background-color: #fff !important;
     box-shadow: 0 0 8rpx rgba(255, 87, 34, 0.2) !important;
   }
-  // 选中时图标颜色
+
   :deep(.uni-easyinput .is-focused .uni-icons) {
     color: $theme-color !important;
   }
-  // placeholder 样式
+
   :deep(.uni-easyinput input::placeholder) {
     color: #bbb;
     font-size: 14px;
@@ -208,17 +167,6 @@ const goRegister = () => {
     right: 0;
     width: fit-content;
     margin: 0 auto;
-  }
-
-  .moreLogin {
-    color: #ccc;
-    margin: 40rpx auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .more {
-      margin-top: 30rpx;
-    }
   }
 }
 </style>

@@ -11,7 +11,7 @@ import { computed, ref } from 'vue'
 const memberStore = useMemberStore()
 // 登陆状态
 const isLogin = computed(() => {
-  return memberStore.profile?.token
+  return memberStore.profile?.access_token
 })
 // 渲染购物车
 const cartList = ref<CartItem[]>()
@@ -23,7 +23,7 @@ const getCartData = async () => {
 // 修改单品数量
 const onChangeCount = async (e: InputNumberBoxEvent, item: CartItem) => {
   if (e.value <= item.stock) {
-    const res = await addCartCountAPI(e.index, { selected: item.selected, count: e.value })
+    const res = await addCartCountAPI(item.cartId, { selected: item.selected, count: e.value })
     console.log(res)
     getCartData()
   } else {
@@ -34,9 +34,14 @@ const onChangeCount = async (e: InputNumberBoxEvent, item: CartItem) => {
 const isAll = computed(() => {
   return cartList.value?.every((item) => item.selected)
 })
-const onCheckChange = async (item: CartItem) => {
-  item.selected = !item.selected
-  const res = await addCartCountAPI(item.skuId, { selected: item.selected, count: item.count })
+const onCheckChange = async (e: UniHelper.CheckboxGroupOnChangeEvent, item: CartItem) => {
+  const selected = e.detail.value.includes(item.cartId)
+  // 部分端在列表渲染后会触发 change，这里避免与当前状态一致时重复请求
+  if (selected === item.selected) {
+    return
+  }
+  item.selected = selected
+  const res = await addCartCountAPI(item.cartId, { selected: item.selected, count: item.count })
   console.log(res)
 }
 const onChangeAll = async () => {
@@ -83,7 +88,7 @@ const options = ref<UniHelper.UniSwipeActionItemOption[]>([
   },
 ])
 const swipeActionRef = ref<UniHelper.UniSwipeActionInstance>()
-const onDel = (e: UniHelper.UniSwipeActionItemOnClickEvent, skuId: string) => {
+const onDel = (e: UniHelper.UniSwipeActionItemOnClickEvent, cartId: string) => {
   console.log(e)
 
   if (e.index === 1) {
@@ -91,7 +96,7 @@ const onDel = (e: UniHelper.UniSwipeActionItemOnClickEvent, skuId: string) => {
       title: '确定要删除吗？',
       success: async (success) => {
         if (success.confirm) {
-          const res = await delCartAPI([skuId])
+          const res = await delCartAPI(cartId)
           console.log(res)
           // 重新渲染购物车
           getCartData()
@@ -109,6 +114,10 @@ const goPay = () => {
   } else {
     uni.showToast({ icon: 'none', title: '请选择商品结算' })
   }
+}
+
+const goGoodsDetail = (item: CartItem) => {
+  uni.navigateTo({ url: `/pages/goodsDetail/goodsDetail?id=${item.productId}` })
 }
 // 触底加载
 const XtxGuessRef = ref<XtxGuessInstance>()
@@ -133,16 +142,16 @@ onShow(() => {
           </view>
           <uni-swipe-action ref="swipeActionRef">
             <uni-swipe-action-item
-              @click="(e) => onDel(e, item.skuId)"
+              @click="(e) => onDel(e, item.cartId)"
               :right-options="options"
               v-for="item in cartList"
-              :key="item.skuId"
+              :key="item.cartId"
             >
               <view class="item">
                 <view class="left">
-                  <checkbox-group @change="onCheckChange(item)">
+                  <checkbox-group @change="(e) => onCheckChange(e, item)">
                     <checkbox
-                      :value="item.skuId"
+                      :value="item.cartId"
                       :checked="item.selected"
                       activeBackgroundColor="#27ba9b"
                       iconColor="#fff"
@@ -150,9 +159,9 @@ onShow(() => {
                   </checkbox-group>
                 </view>
                 <view class="center">
-                  <image :src="item.picture" mode="aspectFill" />
+                  <image :src="item.picture" mode="aspectFill" @click="goGoodsDetail(item)" />
                 </view>
-                <view class="right">
+                <view class="right" @click="goGoodsDetail(item)">
                   <view class="title">{{ item.name }}</view>
                   <view class="style">{{ item.attrsText }}</view>
                   <view class="price">{{ item.nowPrice }}</view>
@@ -162,7 +171,7 @@ onShow(() => {
                     :min="1"
                     :max="item.stock"
                     :modelValue="item.count"
-                    :index="item.skuId"
+                    :index="item.cartId"
                     @change="(e: InputNumberBoxEvent) => onChangeCount(e, item)"
                   ></vk-data-input-number-box>
                 </view>

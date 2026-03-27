@@ -1,7 +1,9 @@
 /** 购物车类型 */
 export type CartItem = {
+  /** 购物车 ID */
+  cartId: string
   /** 商品 ID */
-  id: string
+  productId: string
   /** SKU ID */
   skuId: string
   /** 商品名称 */

@@ -60,7 +60,12 @@ export const http = <T>(options: UniApp.RequestOptions) => {
         } else if (res.statusCode === 401) {
           const memberStore = useMemberStore()
           memberStore.clearProfile()
-          uni.navigateTo({ url: '/pages/login/login' })
+          const pages = getCurrentPages()
+          const currentRoute = pages[pages.length - 1]?.route
+          if (currentRoute !== 'pages/login/login') {
+            // 用 redirectTo 替换当前受限页面，避免返回时再次触发 401 循环跳转
+            uni.redirectTo({ url: '/pages/login/login' })
+          }
           reject(res)
         } else {
           uni.showToast({

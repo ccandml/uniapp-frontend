@@ -9,10 +9,15 @@ import { ref } from 'vue'
 const addressList = ref<AddressItem[]>()
 const getMemberAddress = async () => {
   uni.showLoading()
-  const res = await getMemberAddressAPI()
-  uni.hideLoading()
-  console.log(res)
-  addressList.value = res.result
+  try {
+    const res = await getMemberAddressAPI()
+    console.log(res)
+    addressList.value = res.result
+  } catch {
+    // 401 时请求层会统一跳转登录，这里只兜底关闭 loading
+  } finally {
+    uni.hideLoading()
+  }
 }
 // 滑动
 const options = ref<UniHelper.UniSwipeActionItemOption[]>([

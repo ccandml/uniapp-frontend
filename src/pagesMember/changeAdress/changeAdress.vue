@@ -27,12 +27,17 @@ const fullLocationData = ref<string>() //用作回显
 const getMemberAddressDetail = async () => {
   if (query.id) {
     uni.showLoading({ title: '全力加载中' })
-    const res = await getMemberAddressDetailAPI(query.id)
-    uni.hideLoading()
-    console.log(res)
-    const { id, fullLocation, ...params } = res.result //临时变量，允许在解构赋值时直接用新变量
-    paramsData.value = params
-    fullLocationData.value = fullLocation
+    try {
+      const res = await getMemberAddressDetailAPI(query.id)
+      console.log(res)
+      const { id, fullLocation, ...params } = res.result //临时变量，允许在解构赋值时直接用新变量
+      paramsData.value = params
+      fullLocationData.value = fullLocation
+    } catch {
+      // 401 时请求层会统一跳转登录，这里只兜底关闭 loading
+    } finally {
+      uni.hideLoading()
+    }
   }
 }
 // 新选择器返回单个地区编码，直接用于接口提交

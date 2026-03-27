@@ -1,16 +1,16 @@
 import type { MemberData } from '@/types/member'
 import { http } from '@/utils/request'
 
-// h5手机号，密码登录
-interface numberData {
-  account: string
+// h5 账号，密码登录
+interface stringData {
+  username: string
   password: string
 }
-export const numberLoginAPI = (numberData: numberData) => {
+export const stringLoginAPI = (stringData: stringData) => {
   return http<MemberData>({
     method: 'POST',
-    url: '/login',
-    data: numberData,
+    url: 'http://localhost:3000/cyx/v1/auth/signin',
+    data: stringData,
   })
 }
 
@@ -33,6 +33,6 @@ export const buildLoginAPI = () => {
   return http<MemberData>({
     method: 'POST',
     url: 'http://localhost:3000/cyx/v1/auth/signin',
-    data: { username: 'testuser', password: 'password123' },
+    data: { username: '魔王熙', password: 'password123' },
   })
 }

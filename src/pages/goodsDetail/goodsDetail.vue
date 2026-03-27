@@ -158,7 +158,7 @@ const onAddCart = async (e: SkuPopupEvent) => {
 // 登录状态
 const memberStore = useMemberStore()
 const onBuy = async (e: SkuPopupEvent) => {
-  if (memberStore.profile?.token) {
+  if (memberStore.profile?.access_token) {
     if (addressStore.addressSelectedItem) {
       uni.navigateTo({ url: `/pagesOrder/writeOrder/writeOrder?skuId=${e._id}&count=${e.buy_num}` })
     } else {

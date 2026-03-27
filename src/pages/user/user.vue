@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import XtxGuess from '@/components/XtxGuess.vue'
 import { useMemberStore } from '@/stores'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const orderType = [
   { type: '1', typeName: '待付款', icon: 'wallet' },
@@ -12,6 +12,11 @@ const orderType = [
 ]
 
 const memberStore = useMemberStore()
+const defaultAvatar = '/static/defaultAvatar.png'
+const displayAvatar = computed(() => {
+  const avatar = memberStore.profile?.avatar?.trim()
+  return avatar || defaultAvatar
+})
 
 // 触底加载
 const XtxGuessRef = ref()
@@ -58,7 +63,7 @@ console.log(SystemInfo.safeAreaInsets?.top)
 
         <view class="content" @click="goChangeInfo" v-else>
           <view class="avator">
-            <image :src="memberStore.profile!.avatar" mode="aspectFill" />
+            <image :src="displayAvatar" mode="aspectFill" />
           </view>
           <view class="right">
             <view class="name">{{ memberStore.profile.username }}</view>
