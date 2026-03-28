@@ -1,4 +1,4 @@
-import { http } from '@/utils/request'
+﻿import { http } from '@/utils/request'
 
 export interface RegisterPayload {
   username: string
@@ -8,7 +8,7 @@ export interface RegisterPayload {
 export const registerAPI = (data: RegisterPayload) => {
   return http({
     method: 'POST',
-    url: 'http://localhost:3000/cyx/v1/auth/signup',
+    url: '/auth/signup',
     data,
   })
 }

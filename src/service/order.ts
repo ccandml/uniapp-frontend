@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   LogisticItem,
   OrderCreateParams,
   OrderListParams,
@@ -11,13 +11,13 @@ import { http } from '@/utils/request'
 // 获取预付订单
 export const getOrderPreAPI = () => {
   return http<OrderPreResult>({
-    url: 'http://localhost:3000/cyx/v1/order/pre',
+    url: '/order/pre',
   })
 }
 // 获取立即购买订单
 export const getOrderNowAPI = (data: { skuId: string; count: string; addressId?: string }) => {
   return http<OrderPreResult>({
-    url: 'http://localhost:3000/cyx/v1/order/pre/now',
+    url: '/order/pre/now',
     method: 'POST',
     data,
   })
@@ -26,7 +26,7 @@ export const getOrderNowAPI = (data: { skuId: string; count: string; addressId?:
 export const submiteOrderAPI = (data: OrderCreateParams) => {
   return http<{ id: string }>({
     method: 'POST',
-    url: 'http://localhost:3000/cyx/v1/order',
+    url: '/order',
     data,
   })
 }
@@ -34,7 +34,7 @@ export const submiteOrderAPI = (data: OrderCreateParams) => {
 // 获取订单列表
 export const getOrderListAPI = (data: OrderListParams) => {
   return http<OrderListResult>({
-    url: `http://localhost:3000/cyx/v1/order`,
+    url: `/order`,
     data,
   })
 }
@@ -42,14 +42,14 @@ export const getOrderListAPI = (data: OrderListParams) => {
 // 获取订单详情
 export const getOrderDetailAPI = (id: string) => {
   return http<OrderResult>({
-    url: `http://localhost:3000/cyx/v1/order/${id}`,
+    url: `/order/${id}`,
   })
 }
 
 // 模拟支付
 export const payAPI = (orderId: string) => {
   return http({
-    url: `http://localhost:3000/cyx/v1/order/pay/${orderId}`,
+    url: `/order/pay/${orderId}`,
     method: 'PUT',
   })
 }
@@ -57,7 +57,7 @@ export const payAPI = (orderId: string) => {
 // 模拟发货
 export const transportAPI = (id: string) => {
   return http({
-    url: `http://localhost:3000/cyx/v1/order/consign/${id}`,
+    url: `/order/consign/${id}`,
     method: 'PUT',
   })
 }
@@ -65,21 +65,21 @@ export const transportAPI = (id: string) => {
 // 获取物流信息
 export const getTransportDetailAPI = (id: string) => {
   return http<LogisticItem[]>({
-    url: `http://localhost:3000/cyx/v1/order/logistics/${id}`,
+    url: `/order/logistics/${id}`,
   })
 }
 
 // 确认收货
 export const collectTransportAPI = (id: string) => {
   return http({
-    url: `http://localhost:3000/cyx/v1/order/receipt/${id}`,
+    url: `/order/receipt/${id}`,
     method: 'PUT',
   })
 }
 // 删除订单
 export const delOrderAPI = (id: string) => {
   return http({
-    url: `http://localhost:3000/cyx/v1/order/${id}`,
+    url: `/order/${id}`,
     method: 'DELETE',
   })
 }

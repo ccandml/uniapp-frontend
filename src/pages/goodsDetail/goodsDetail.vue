@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { addCartAPI } from '@/service/cart'
+import { addCartAPI, getCartAPI } from '@/service/cart'
 import AddressCom from './components/AddressCom.vue'
 import { getGoodsDetailAPI } from '@/service/goodsDetail'
 import type { GoodsResult } from '@/types/goodsDetail'
@@ -8,7 +8,7 @@ import type {
   SkuPopupInstance,
   SkuPopupLocaldata,
 } from '@/types/vk-data-goods-sku-popup'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
 import { useAddressStore, useMemberStore } from '@/stores'
 // 安全区
@@ -31,7 +31,7 @@ const options = ref([
   {
     icon: 'cart' as UniHelper.UniIconsType,
     text: '购物车',
-    info: 2,
+    info: 0,
     infoBackgroundColor: '#27ba9b',
     infoColor: '#f5f5f5',
   },
@@ -148,6 +148,7 @@ const skuValue = computed(() => {
 const onAddCart = async (e: SkuPopupEvent) => {
   const res = await addCartAPI({ skuId: e._id, count: e.buy_num })
   console.log(res)
+  await updateCartBadge()
   uni.showToast({
     icon: 'success',
     title: '添加成功',
@@ -164,8 +165,27 @@ const onBuy = async (e: SkuPopupEvent) => {
     uni.navigateTo({ url: '/pages/login/login' })
   }
 }
+
+// 购物车角标：实时展示购物车商品总数量
+const updateCartBadge = async () => {
+  const cartOption = options.value[2]
+  if (!cartOption) return
+
+  if (!memberStore.profile?.access_token) {
+    cartOption.info = 0
+    return
+  }
+  const res = await getCartAPI()
+  const totalCount = res.result.reduce((sum, item) => sum + item.count, 0)
+  cartOption.info = totalCount > 99 ? 99 : totalCount
+}
+
 onLoad(() => {
   getGoods()
+  updateCartBadge()
+})
+onShow(() => {
+  updateCartBadge()
 })
 const popup = ref()
 </script>

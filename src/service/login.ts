@@ -1,4 +1,4 @@
-import type { MemberData } from '@/types/member'
+﻿import type { MemberData } from '@/types/member'
 import { http } from '@/utils/request'
 
 // h5 账号密码登录
@@ -9,7 +9,7 @@ interface stringData {
 export const stringLoginAPI = (stringData: stringData) => {
   return http<MemberData>({
     method: 'POST',
-    url: 'http://localhost:3000/cyx/v1/auth/signin',
+    url: '/auth/signin',
     data: stringData,
   })
 }
@@ -23,7 +23,7 @@ interface wxData {
 export const wxLoginAPI = (wxData: wxData) => {
   return http<MemberData>({
     method: 'POST',
-    url: 'http://localhost:3000/cyx/v1/login/wxMin',
+    url: '/login/wxMin',
     data: wxData,
   })
 }
@@ -32,7 +32,7 @@ export const wxLoginAPI = (wxData: wxData) => {
 export const buildLoginAPI = () => {
   return http<MemberData>({
     method: 'POST',
-    url: 'http://localhost:3000/cyx/v1/auth/signin',
-    data: { username: '魔王', password: 'password123' },
+    url: '/auth/signin',
+    data: { username: '魔王熙', password: 'password123' },
   })
 }

@@ -1,11 +1,11 @@
-import type { SearchList, SearchParams } from '@/types/search'
+﻿import type { SearchList, SearchParams } from '@/types/search'
 import type { PagesResult } from '@/types/global'
 import { http } from '@/utils/request'
 
 // 搜索
 export const getSearchListAPI = (data: SearchParams) => {
   return http<PagesResult<SearchList[]>>({
-    url: 'http://localhost:3000/cyx/v1/products/search',
+    url: '/products/search',
     method: 'GET',
     data,
   })

@@ -1,9 +1,9 @@
-import type { CartItem } from '@/types/cart'
+﻿import type { CartItem } from '@/types/cart'
 import { http } from '@/utils/request'
 // 添加购物车
 export const addCartAPI = (data: { skuId: string; count: number }) => {
   return http({
-    url: 'http://localhost:3000/cyx/v1/cart-item',
+    url: '/cart-item',
     method: 'POST',
     data,
   })
@@ -11,14 +11,14 @@ export const addCartAPI = (data: { skuId: string; count: number }) => {
 // 获取购物车列表
 export const getCartAPI = () => {
   return http<CartItem[]>({
-    url: 'http://localhost:3000/cyx/v1/cart-item',
+    url: '/cart-item',
     method: 'GET',
   })
 }
 // 修改购物车（选中、数量）
 export const addCartCountAPI = (cartId: string, data: { selected: boolean; count: number }) => {
   return http<CartItem>({
-    url: `http://localhost:3000/cyx/v1/cart-item/${cartId}`,
+    url: `/cart-item/${cartId}`,
     method: 'PUT',
     data,
   })
@@ -26,7 +26,7 @@ export const addCartCountAPI = (cartId: string, data: { selected: boolean; count
 // 全选
 export const selectedAllCartAPI = (selected: boolean) => {
   return http({
-    url: `http://localhost:3000/cyx/v1/cart-item/selected/all`,
+    url: `/cart-item/selected/all`,
     method: 'PUT',
     data: {
       selected,
@@ -36,7 +36,7 @@ export const selectedAllCartAPI = (selected: boolean) => {
 // 删除购物车
 export const delCartAPI = (cartId: string) => {
   return http({
-    url: `http://localhost:3000/cyx/v1/cart-item/${cartId}`,
+    url: `/cart-item/${cartId}`,
     method: 'DELETE',
   })
 }
