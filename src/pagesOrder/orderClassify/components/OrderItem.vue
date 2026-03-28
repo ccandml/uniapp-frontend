@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { getOrderListAPI } from '@/service/order'
+import { delOrderAPI, getOrderListAPI } from '@/service/order'
 import type { PagesRequest } from '@/types/global'
 import type { OrderItem, OrderListResult } from '@/types/order'
 import { onShow } from '@dcloudio/uni-app'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 
 const query = defineProps<{ orderType: string | number }>()
 const pageParams = ref<PagesRequest>({
@@ -24,18 +24,25 @@ const orderData = ref<OrderListResult>()
 const orderList = ref<OrderItem[]>()
 const getOrderList = async () => {
   uni.showLoading()
-  const res = await getOrderListAPI({
-    ...pageParams.value,
-    orderState: query.orderType,
-  })
-  // 请求完毕
-  if (res.result.items.length < pageParams.value.pageSize) {
-    isLoading.value = false
+  try {
+    const res = await getOrderListAPI({
+      ...pageParams.value,
+      orderState: Number(query.orderType) || 0,
+    })
+    // 请求完毕
+    if (res.result.items.length < pageParams.value.pageSize) {
+      isLoading.value = false
+    }
+    console.log(res)
+    orderData.value = res.result
+    orderList.value = [...(orderList.value || []), ...res.result.items]
+  } catch (error) {
+    // 触底翻页请求失败时回退页码，避免后续漏页
+    if (pageParams.value.page > 1) pageParams.value.page--
+    throw error
+  } finally {
+    uni.hideLoading()
   }
-  uni.hideLoading()
-  console.log(res)
-  orderData.value = res.result
-  orderList.value = [...(orderList.value || []), ...res.result.items]
 }
 // 触底请求
 const isLoading = ref(true)
@@ -48,7 +55,34 @@ const onScrolltolower = () => {
 const goOrderDetail = (id: string) => {
   uni.navigateTo({ url: `/pagesOrder/orderDetail/orderDetail?id=${id}` })
 }
+// 删除订单
+const delOrder = (id: string) => {
+  uni.showModal({
+    title: '删除订单后该订单将消失，确定要删除吗？',
+    success: async (success) => {
+      if (!success.confirm) return
+      const res = await delOrderAPI(id)
+      console.log(res)
+      uni.showToast({ icon: 'success', title: '订单已删除!' })
+      // 删除后回到第一页重新拉取，避免列表状态不一致
+      pageParams.value.page = 1
+      pageParams.value.pageSize = 5
+      orderList.value = undefined
+      isLoading.value = true
+      await getOrderList()
+    },
+  })
+}
+// 去评价
+const goJudge = () => {
+  uni.showToast({ icon: 'success', title: '五星好评！' })
+}
+// 每次进入页面时重置分页参数，防止重复叠加请求
 onShow(() => {
+  pageParams.value.page = 1
+  pageParams.value.pageSize = 5
+  orderList.value = undefined
+  isLoading.value = true
   getOrderList()
 })
 </script>
@@ -76,8 +110,15 @@ onShow(() => {
         </view>
         <view class="select">
           <view v-if="[1].includes(item.orderState ?? 0)" class="btn right">去付款</view>
-          <view v-if="[4, 5, 6].includes(item.orderState ?? 0)" class="btn left">删除订单</view>
-          <view v-if="[4, 5, 6].includes(item.orderState ?? 0)" class="btn">去评价</view>
+          <view
+            v-if="[4, 5, 6].includes(item.orderState ?? 0)"
+            class="btn left"
+            @click.stop="delOrder(item.id)"
+            >删除订单</view
+          >
+          <view v-if="[4, 5, 6].includes(item.orderState ?? 0)" class="btn" @click.stop="goJudge"
+            >去评价</view
+          >
           <view v-if="[3].includes(item.orderState ?? 0)" class="btn">确认收货</view>
           <view class="btn right">申请售后</view>
         </view>
@@ -140,6 +181,7 @@ onShow(() => {
             height: 80rpx;
             overflow: hidden;
             display: -webkit-box; // 弹性盒子模型
+            line-clamp: 2;
             -webkit-box-orient: vertical; // 垂直方向
             -webkit-line-clamp: 2; // 显示2行
             text-overflow: ellipsis;

@@ -13,6 +13,19 @@ export const useMemberStore = defineStore(
       profile.value.username = val.username
       profile.value.avatar = val.avatar
     }
+
+    const setUsername = (username: string) => {
+      if (profile.value) {
+        profile.value.username = username
+      }
+    }
+
+    const setAvatar = (avatar: string) => {
+      if (profile.value) {
+        profile.value.avatar = avatar
+      }
+    }
+
     //   清理会员信息
     const clearProfile = () => {
       profile.value = undefined
@@ -20,6 +33,8 @@ export const useMemberStore = defineStore(
     return {
       profile,
       setProfile,
+      setUsername,
+      setAvatar,
       clearProfile,
     }
   },

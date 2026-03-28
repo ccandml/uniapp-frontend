@@ -1,4 +1,5 @@
 import type { AddressItem } from './address'
+import type { PagesRequest } from './global'
 
 /** 获取预付订单 返回信息 */
 export type OrderPreResult = {
@@ -13,8 +14,6 @@ export type OrderPreResult = {
     /** 应付金额 */
     totalPayPrice: number
   }
-  /** 用户地址列表 [ 地址信息 ] */
-  userAddresses: AddressItem[]
 }
 
 /** 商品信息 */
@@ -23,8 +22,8 @@ export type OrderPreGoods = {
   attrsText: string
   /** 数量 */
   count: number
-  /** id */
-  id: string
+  /** 商品id */
+  spuId: string
   /** 商品名称 */
   name: string
   /** 实付单价 */
@@ -112,36 +111,16 @@ export type OrderSkuItem = {
   image: string
 }
 
-/** 物流信息 返回值类型 */
-export type OrderLogisticResult = {
-  /** 快递公司 */
-  company: {
-    /** 公司名称 */
-    name: string
-    /** 快递编号 */
-    number: string
-    /** 联系电话 */
-    tel: string
-  }
-  /** 商品件数 */
-  count: number
-  /** 物流日志 */
-  list: LogisticItem[]
-}
-
 /** 物流日志 */
 export type LogisticItem = {
   /** 信息ID */
   id: string
   /** 信息文字 */
   text: string
-  /** 时间 */
-  time: string
 }
 
-import type { PageParams } from '@/types/global'
 /** 订单列表参数 */
-export type OrderListParams = PageParams & { orderState: number }
+export type OrderListParams = PagesRequest & { orderState: number }
 
 /** 订单列表 */
 export type OrderListResult = {

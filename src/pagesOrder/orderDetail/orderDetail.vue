@@ -14,21 +14,19 @@ import { ref } from 'vue'
 const { safeAreaInsets } = uni.getSystemInfoSync()
 // 接收传参
 const query = defineProps<{ id: string }>()
-// 返回
+// 返回 - 返回到订单列表页（只返回1级）
 const goBack = () => {
-  uni.navigateBack({ delta: 2 })
+  uni.navigateBack({ delta: 1 })
 }
 // 获取订单详情
 const orderData = ref<OrderResult>()
 const getOrderDetail = async () => {
-  uni.showLoading({ mask: true, title: '全力加载中...' })
   const res = await getOrderDetailAPI(query.id)
   console.log(res)
   orderData.value = res.result
   orderState.value = state[res.result.orderState]
   // 获取物流信息
   await getTransportDetail()
-  uni.hideLoading()
 }
 // 订单状态
 const state: Record<number, string> = {
@@ -58,7 +56,7 @@ const goPay = () => {
           title: '支付成功!',
         })
         setTimeout(() => {
-          uni.reLaunch({ url: '/pagesOrder/orderClassify/orderClassify?type=2' })
+          uni.navigateTo({ url: '/pagesOrder/orderClassify/orderClassify?type=2' })
         }, 1000)
         console.log(res)
       }
@@ -77,7 +75,7 @@ const onTransport = () => {
           title: '发货成功!',
         })
         setTimeout(() => {
-          uni.reLaunch({ url: '/pagesOrder/orderClassify/orderClassify?type=3' })
+          uni.navigateTo({ url: '/pagesOrder/orderClassify/orderClassify?type=3' })
         }, 1000)
         console.log(res)
       }
@@ -103,7 +101,7 @@ const onCollect = () => {
           title: '订单已完成!',
         })
         setTimeout(() => {
-          uni.reLaunch({ url: '/pagesOrder/orderClassify/orderClassify?type=4' })
+          uni.navigateTo({ url: '/pagesOrder/orderClassify/orderClassify?type=4' })
         }, 1000)
       }
     },
@@ -123,7 +121,7 @@ const delOrder = () => {
         console.log(res)
         // 跳转页面
         setTimeout(() => {
-          uni.navigateBack()
+          uni.navigateTo({ url: '/pagesOrder/orderClassify/orderClassify?type=0' })
         }, 1000)
       }
     },
@@ -135,7 +133,7 @@ const getTransportDetail = async () => {
   if ([3, 4, 5].includes(orderData.value!.orderState)) {
     const res = await getTransportDetailAPI(query.id)
     console.log(res)
-    transportDetail.value = [...res.result.list].reverse() //倒叙数组
+    transportDetail.value = [...res.result]
   }
 }
 onLoad(() => {
@@ -187,7 +185,7 @@ onLoad(() => {
             <image src="../../static/images/car.png" mode="aspectFit" />
             <view>
               <view class="data">{{ item.text }}</view>
-              <view class="time">{{ item.time }}</view>
+              <!-- <view class="time">{{ item.time }}</view> -->
             </view>
           </view>
         </template>
@@ -341,6 +339,7 @@ onLoad(() => {
             height: 80rpx;
             overflow: hidden;
             display: -webkit-box; // 弹性盒子模型
+            line-clamp: 2;
             -webkit-box-orient: vertical; // 垂直方向
             -webkit-line-clamp: 2; // 显示2行
             text-overflow: ellipsis;

@@ -47,10 +47,11 @@ const inputValue = ref()
 const orderData = ref<OrderPreResult>()
 const getOrderPre = async () => {
   if (query.skuId) {
+    // 未选择地址时也允许进入预览页，addressId 按后端可选参数传递
     const res = await getOrderNowAPI({
       skuId: query.skuId,
       count: query.count,
-      addressId: addressStore.addressSelectedItem!.id,
+      addressId: addressStore.addressSelectedItem?.id,
     })
     console.log(res)
     orderData.value = res.result
@@ -64,9 +65,13 @@ const getOrderPre = async () => {
 const orderId = ref<string>()
 // 提交
 const onSubmite = async () => {
+  if (!orderData.value?.goods?.length) {
+    uni.showToast({ icon: 'none', title: '订单信息加载中，请稍后' })
+    return
+  }
   if (addressStore.addressSelectedItem) {
     const res = await submiteOrderAPI({
-      goods: orderData.value!.goods.map((item) => {
+      goods: orderData.value.goods.map((item) => {
         return {
           count: item.count,
           skuId: item.skuId,
@@ -115,11 +120,11 @@ onLoad(() => {
           <view class="title">{{ item.name }}</view>
           <view class="style">{{ item.attrsText }}</view>
           <view class="bottom">
-            <view class="price">￥{{ item.payPrice }}</view>
-            <view class="oldPrice">{{ item.price }}</view>
+            <view class="price">￥{{ item.totalPayPrice }}</view>
+            <view class="oldPrice">{{ item.totalPrice }}</view>
           </view>
         </view>
-        <view class="count">x 1</view>
+        <view class="count">x {{ item.count }}</view>
       </view>
     </view>
     <view class="params card">
@@ -142,15 +147,15 @@ onLoad(() => {
     <view class="data card">
       <view class="item">
         <view>商品总价:</view>
-        <view>￥{{ orderData?.summary.totalPrice.toFixed(2) }}</view>
+        <view>￥{{ (orderData?.summary.totalPrice ?? 0).toFixed(2) }}</view>
       </view>
       <view class="item">
         <view>运费:</view>
-        <view>￥{{ orderData?.summary.postFee.toFixed(2) }}</view>
+        <view>￥{{ (orderData?.summary.postFee ?? 0).toFixed(2) }}</view>
       </view>
     </view>
     <view class="btn" :style="{ 'padding-bottom': finalPaddingBottom }">
-      <view class="left">￥{{ orderData?.summary.totalPayPrice.toFixed(2) }}</view>
+      <view class="left">￥{{ (orderData?.summary.totalPayPrice ?? 0).toFixed(2) }}</view>
       <view @click="onSubmite" class="right">提交订单</view>
     </view>
   </view>
@@ -225,6 +230,7 @@ page {
           height: 80rpx;
           overflow: hidden;
           display: -webkit-box; // 弹性盒子模型
+          line-clamp: 2;
           -webkit-box-orient: vertical; // 垂直方向
           -webkit-line-clamp: 2; // 显示2行
           text-overflow: ellipsis;

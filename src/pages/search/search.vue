@@ -6,10 +6,11 @@ const historyStore = useHistoryStore()
 const searchInput = ref()
 // 点击搜索
 const onSearch = () => {
-  if (!searchInput.value.trim()) {
+  const keyword = String(searchInput.value || '').trim()
+  if (!keyword) {
     return (searchInput.value = '')
   }
-  historyStore.setHistory(searchInput.value)
+  historyStore.setHistory(keyword)
   uni.navigateTo({ url: '/pages/search/searchDetail/searchDetail' })
   searchInput.value = ''
 }

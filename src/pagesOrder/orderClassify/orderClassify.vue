@@ -2,11 +2,13 @@
 import { ref } from 'vue'
 import OrderItem from './components/OrderItem.vue'
 import { onBackPress } from '@dcloudio/uni-app'
-// 返回固定页
+
+// 返回时统一返回到用户页
 onBackPress(() => {
   uni.reLaunch({ url: '/pages/user/user' })
-  return true // 关键：阻止默认 pop
+  return true // 阻止默认返回
 })
+
 const orderType = ref([
   { type: 0, name: '全部' },
   { type: 1, name: '待付款' },

@@ -61,9 +61,7 @@ const onAvatorChange = async () => {
   if (userInfo.value) {
     userInfo.value.avatar = avatarUrl
   }
-  if (memberStore.profile) {
-    memberStore.profile.avatar = avatarUrl
-  }
+  memberStore.setAvatar(avatarUrl)
   uni.showToast({
     title: '头像更新成功',
     icon: 'success',
@@ -103,8 +101,8 @@ const submit = async () => {
   const res = await updateUserInfoAPI(requestProfile.value)
   console.log(res)
   console.log(requestProfile.value)
-  // 修改pinia数据同步
-  memberStore.profile!.username = requestProfile.value.username
+  // 以后端返回为准，避免前端本地值与服务端规范化结果不一致
+  memberStore.setUsername(res.result.username)
   uni.showToast({
     title: '修改成功！',
     icon: 'success',

@@ -159,11 +159,7 @@ const onAddCart = async (e: SkuPopupEvent) => {
 const memberStore = useMemberStore()
 const onBuy = async (e: SkuPopupEvent) => {
   if (memberStore.profile?.access_token) {
-    if (addressStore.addressSelectedItem) {
-      uni.navigateTo({ url: `/pagesOrder/writeOrder/writeOrder?skuId=${e._id}&count=${e.buy_num}` })
-    } else {
-      uni.showToast({ icon: 'none', title: '请选择收货地址' })
-    }
+    uni.navigateTo({ url: `/pagesOrder/writeOrder/writeOrder?skuId=${e._id}&count=${e.buy_num}` })
   } else {
     uni.navigateTo({ url: '/pages/login/login' })
   }

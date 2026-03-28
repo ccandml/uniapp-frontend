@@ -111,9 +111,7 @@ const goRegister = () => {
     <!-- #ifndef H5 -->
     <view class="button">
       <view class="showbutton">快捷登录</view>
-      <button open-type="getPhoneNumber" @getphonenumber="onGetPhoneNumber" @click="onSubmit">
-        登录
-      </button>
+      <button open-type="getPhoneNumber" @getphonenumber="onGetPhoneNumber">登录</button>
     </view>
     <!-- #endif -->
     <view class="moreLogin">

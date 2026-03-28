@@ -45,13 +45,14 @@ const onCheckChange = async (e: UniHelper.CheckboxGroupOnChangeEvent, item: Cart
   console.log(res)
 }
 const onChangeAll = async () => {
+  if (!cartList.value?.length) return
   let selectedAll = !isAll.value
   console.log(!isAll.value)
   const res = await selectedAllCartAPI(!isAll.value)
   console.log(res)
   // 重新渲染购物车
   console.log(selectedAll)
-  cartList.value!.forEach((item) => {
+  cartList.value.forEach((item) => {
     item.selected = selectedAll
   })
 }
@@ -109,7 +110,7 @@ const onDel = (e: UniHelper.UniSwipeActionItemOnClickEvent, cartId: string) => {
 }
 // 结算订单
 const goPay = () => {
-  if (allCount.value! > 0) {
+  if ((allCount.value || 0) > 0) {
     uni.navigateTo({ url: '/pagesOrder/writeOrder/writeOrder' })
   } else {
     uni.showToast({ icon: 'none', title: '请选择商品结算' })
@@ -287,6 +288,7 @@ page {
             .title {
               overflow: hidden;
               display: -webkit-box; // 弹性盒子模型
+              line-clamp: 2;
               -webkit-box-orient: vertical; // 垂直方向
               -webkit-line-clamp: 2; // 显示2行
               text-overflow: ellipsis;
