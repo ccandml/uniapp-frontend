@@ -26,7 +26,6 @@ uni.setNavigationBarTitle({
 const fullLocationData = ref<string>() //用作回显
 const getMemberAddressDetail = async () => {
   if (query.id) {
-    uni.showLoading({ title: '全力加载中' })
     try {
       const res = await getMemberAddressDetailAPI(query.id)
       console.log(res)
@@ -34,9 +33,7 @@ const getMemberAddressDetail = async () => {
       paramsData.value = params
       fullLocationData.value = fullLocation
     } catch {
-      // 401 时请求层会统一跳转登录，这里只兜底关闭 loading
-    } finally {
-      uni.hideLoading()
+      // 401 时请求层会统一跳转登录
     }
   }
 }

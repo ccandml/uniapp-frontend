@@ -8,15 +8,12 @@ import { ref } from 'vue'
 // 请求数据
 const addressList = ref<AddressItem[]>()
 const getMemberAddress = async () => {
-  uni.showLoading()
   try {
     const res = await getMemberAddressAPI()
     console.log(res)
     addressList.value = res.result
   } catch {
-    // 401 时请求层会统一跳转登录，这里只兜底关闭 loading
-  } finally {
-    uni.hideLoading()
+    // 401 时请求层会统一跳转登录
   }
 }
 // 滑动

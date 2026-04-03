@@ -74,6 +74,8 @@ export type SkuPopupProps = {
   specListName?: string
   /** 字段名 - sku库存的字段名 */
   stockName?: string
+  /** 字段名 - sku是否可购买的字段名（1可购买 0不可购买） */
+  availableName?: string
   /** 字段名 - sku组合路径的字段名 */
   skuArrName?: string
   /** 字段名 - 商品缩略图字段名(未选择sku时) */
@@ -129,6 +131,8 @@ export type SkuPopupSkuItem = {
   sku_name_arr: string[]
   /** SKU 库存 */
   stock: number
+  /** SKU 是否可购买（1可购买 0不可购买） */
+  available?: 1 | 0
 }
 
 /** 当前选择的sku数据 */

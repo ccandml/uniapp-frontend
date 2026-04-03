@@ -33,6 +33,6 @@ export const buildLoginAPI = () => {
   return http<MemberData>({
     method: 'POST',
     url: '/auth/signin',
-    data: { username: '魔王熙', password: 'password123' },
+    data: { username: '普通用户1', password: '123123' },
   })
 }

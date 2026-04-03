@@ -5,6 +5,17 @@ import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
 const memberStore = useMemberStore()
+const redirectUrl = ref('')
+const TAB_BAR_PAGES = [
+  '/pages/index/index',
+  '/pages/classify/classify',
+  '/pages/cart/cart',
+  '/pages/user/user',
+]
+
+onLoad((options) => {
+  redirectUrl.value = decodeURIComponent((options?.redirect as string) || '')
+})
 
 // H5端登录
 // #ifdef H5
@@ -62,6 +73,10 @@ const onGetPhoneNumber: UniHelper.ButtonOnGetphonenumber = async (res) => {
 const onSubmit = async () => {
   await form.value.validate()
   const res = await stringLoginAPI(formData.value)
+  if (res.code == '401') {
+    uni.showToast({ icon: 'none', title: res.message || '登录失败' })
+    return
+  }
   console.log(res)
   memberStore.setProfile(res.result)
   loginSuccess()
@@ -79,6 +94,16 @@ const simpleLogin = async () => {
 const loginSuccess = () => {
   uni.showToast({ icon: 'success', title: '登陆成功！' })
   setTimeout(() => {
+    // 如果有来源页，优先回跳来源；tabBar 页面必须使用 switchTab
+    if (redirectUrl.value) {
+      const path = redirectUrl.value.split('?')[0] || ''
+      if (TAB_BAR_PAGES.includes(path)) {
+        uni.switchTab({ url: path })
+      } else {
+        uni.redirectTo({ url: redirectUrl.value })
+      }
+      return
+    }
     uni.navigateBack()
   }, 1000)
 }
@@ -115,7 +140,7 @@ const goRegister = () => {
     </view>
     <!-- #endif -->
     <view class="moreLogin">
-      --------------其他登录方式--------------
+      --------------快捷登录--------------
       <view @click="simpleLogin" class="more">
         <uni-icons type="contact" size="40" color="#ccc"></uni-icons>
       </view>

@@ -108,6 +108,8 @@ const getGoods = async () => {
         image: item.picture,
         price: item.price * 100,
         stock: item.inventory,
+        // 1 可购买，0 不可购买；未返回时默认可购买
+        available: item.available ?? 1,
         sku_name_arr: item.specs.map((i) => i.valueName),
       }
     }),

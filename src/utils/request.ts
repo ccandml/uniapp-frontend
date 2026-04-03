@@ -1,6 +1,6 @@
 import { useMemberStore } from '@/stores'
 
-const BASE_URL = 'http://localhost:3000/cyx/v1'
+const BASE_URL = 'https://cyx-0sar.onrender.com/cyx/v1'
 const httpInterceptor = {
   // 请求前拦截
   invoke(options: UniApp.RequestOptions) {
@@ -39,17 +39,56 @@ uni.addInterceptor('uploadFile', httpInterceptor)
  *    2.1 提取核心数据 res.data
  *    2.2 添加类型，支持泛型
  *  3. 获取数据失败
- *    3.1 401错误  -> 清理用户信息，跳转到登录页
- *    3.2 其他错误 -> 根据后端错误信息轻提示
- *    3.3 网络错误 -> 提示用户换网络
+ *    3.1 登录接口401 -> 提示账号或密码错误
+ *    3.2 其他接口401 -> 清理用户信息，跳转到登录页
+ *    3.3 其他错误 -> 根据后端错误信息轻提示
+ *    3.4 网络错误 -> 提示用户换网络
  */
 interface Data<T> {
   code: string
   message: string
   result: T
 }
-export const http = <T>(options: UniApp.RequestOptions) => {
+
+interface HttpRequestOptions extends UniApp.RequestOptions {
+  // 允许调用方按需关闭全局 loading（默认开启）
+  loading?: boolean
+}
+
+let loadingRequestCount = 0
+
+const startGlobalLoading = () => {
+  if (loadingRequestCount === 0) {
+    uni.showLoading({
+      title: '加载中...',
+      // 开启遮罩，防止加载中误触页面交互
+      mask: true,
+    })
+  }
+  loadingRequestCount += 1
+}
+
+const stopGlobalLoading = () => {
+  loadingRequestCount = Math.max(loadingRequestCount - 1, 0)
+  if (loadingRequestCount === 0) {
+    uni.hideLoading()
+  }
+}
+
+// 登录接口返回 401 时，只提示账号密码错误，不做全局过期跳转。
+const LOGIN_API_PATHS = ['/auth/signin', '/login/wxMin']
+
+const isLoginRequest = (url = '') => {
+  return LOGIN_API_PATHS.some((path) => url.includes(path))
+}
+
+export const http = <T>(options: HttpRequestOptions) => {
   return new Promise<Data<T>>((resolve, reject) => {
+    const needLoading = options.loading !== false
+    if (needLoading) {
+      startGlobalLoading()
+    }
+    const requestUrl = options.url || ''
     uni.request({
       ...options,
       //  响应成功
@@ -57,13 +96,39 @@ export const http = <T>(options: UniApp.RequestOptions) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data as Data<T>)
         } else if (res.statusCode === 401) {
+          if (isLoginRequest(requestUrl)) {
+            uni.showToast({
+              icon: 'none',
+              title: '账号或密码错误',
+            })
+            reject(res)
+            return
+          }
+
+          uni.showToast({
+            icon: 'none',
+            title: '登录已过期，请重新登录',
+          })
           const memberStore = useMemberStore()
           memberStore.clearProfile()
           const pages = getCurrentPages()
-          const currentRoute = pages[pages.length - 1]?.route
+          const currentPage = pages[pages.length - 1] as {
+            route?: string
+            options?: Record<string, unknown>
+          }
+          const currentRoute = currentPage?.route
           if (currentRoute !== 'pages/login/login') {
-            // 用 redirectTo 替换当前受限页面，避免返回时再次触发 401 循环跳转
-            uni.redirectTo({ url: '/pages/login/login' })
+            const path = `/${currentRoute}`
+            const query = Object.entries(currentPage?.options || {})
+              .map(
+                ([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`,
+              )
+              .join('&')
+            const redirect = query ? `${path}?${query}` : path
+            // 记录来源页，登录成功后可回跳；同时用 redirectTo 避免 401 时页面栈循环堆积
+            uni.redirectTo({
+              url: `/pages/login/login?redirect=${encodeURIComponent(redirect)}`,
+            })
           }
           reject(res)
         } else {
@@ -80,6 +145,11 @@ export const http = <T>(options: UniApp.RequestOptions) => {
           title: '网络错误，换个网络试试~',
         })
         reject(err)
+      },
+      complete() {
+        if (needLoading) {
+          stopGlobalLoading()
+        }
       },
     })
   })

@@ -43,6 +43,8 @@ export type DetailsPropertyItem = {
 export type SkuItem = {
   /** id */
   id: string
+  /** 是否可购买（1可购买 0不可购买） */
+  available?: 1 | 0
   /** 库存 */
   inventory: number
   /** 原价 */

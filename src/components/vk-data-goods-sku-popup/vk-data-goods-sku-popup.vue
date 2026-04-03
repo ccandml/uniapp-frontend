@@ -198,6 +198,11 @@ export default {
 			type: String,
 			default: 'stock'
 		},
+		// 可购买状态字段名 默认 available（1:可购买 0:不可购买）
+		availableName: {
+			type: String,
+			default: 'available'
+		},
 		// sku组合路径的字段名
 		skuArrName: {
 			type: String,
@@ -731,14 +736,15 @@ export default {
 		checkItem() {
 			let that = this;
 			// console.time('计算有多小种可选路径需要的时间是');
-			let { stockName } = that;
+			let { stockName, availableName } = that;
 			let skuListName = that.skuListName;
-			// 去除库存小于等于0的商品sku
+			// 去除库存小于等于0或不可购买的sku
 			let originalSkuList = that.goodsInfo[skuListName];
 			let skuList = [];
 			let stockNum = 0;
 			originalSkuList.map((skuItem, index) => {
-				if (skuItem[stockName] > 0) {
+				let isAvailable = Number(skuItem[availableName] ?? 1) === 1;
+				if (skuItem[stockName] > 0 && isAvailable) {
 					skuList.push(skuItem);
 					stockNum += skuItem[stockName];
 				}
@@ -790,9 +796,13 @@ export default {
 				return false;
 			}
 			that.clickTime = clickTime;
-			let { selectShop, selectNum, stockText, stockName } = that;
+			let { selectShop, selectNum, stockText, stockName, availableName } = that;
 			if (!selectShop || !selectShop[that.skuIdName]) {
 				that.toast('请先选择对应规格', 'none');
+				return false;
+			}
+			if (Number(selectShop[availableName] ?? 1) !== 1) {
+				that.toast('当前规格暂不可购买', 'none');
 				return false;
 			}
 			if (selectNum <= 0) {

@@ -23,7 +23,6 @@ const state: Record<number, string> = {
 const orderData = ref<OrderListResult>()
 const orderList = ref<OrderItem[]>()
 const getOrderList = async () => {
-  uni.showLoading()
   try {
     const res = await getOrderListAPI({
       ...pageParams.value,
@@ -40,8 +39,6 @@ const getOrderList = async () => {
     // 触底翻页请求失败时回退页码，避免后续漏页
     if (pageParams.value.page > 1) pageParams.value.page--
     throw error
-  } finally {
-    uni.hideLoading()
   }
 }
 // 触底请求
