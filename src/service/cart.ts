@@ -13,6 +13,7 @@ export const getCartAPI = () => {
   return http<CartItem[]>({
     url: '/cart-item',
     method: 'GET',
+    loading: false,
   })
 }
 // 修改购物车（选中、数量）
