@@ -4,5 +4,6 @@ import { http } from '@/utils/request'
 export const getClassifyAPI = () => {
   return http<ClassifyData[]>({
     url: '/categories',
+    loading: false,
   })
 }
