@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import XtxGuess from '@/components/XtxGuess.vue'
+import BackTop from '@/components/BackTop.vue'
 import { addCartCountAPI, delCartAPI, getCartAPI, selectedAllCartAPI } from '@/service/cart'
 import { useMemberStore } from '@/stores'
 import type { CartItem } from '@/types/cart'
@@ -125,6 +126,12 @@ const XtxGuessRef = ref<XtxGuessInstance>()
 const onScrolltolower = () => {
   XtxGuessRef.value?.getGuessList()
 }
+const scrollTop = ref(0)
+const onScroll = (e: any) => {
+  scrollTop.value = e.detail.scrollTop
+}
+// 通过全局回到顶部组件控制当前 scroll-view 回顶。
+const scrollIntoView = ref('')
 onShow(() => {
   if (isLogin.value) {
     getCartData()
@@ -134,7 +141,15 @@ onShow(() => {
 
 <template>
   <view class="cart">
-    <scroll-view class="scroll" scroll-y @scrolltolower="onScrolltolower">
+    <scroll-view
+      class="scroll"
+      @scroll="onScroll"
+      :scroll-into-view="scrollIntoView"
+      scroll-with-animation
+      scroll-y
+      @scrolltolower="onScrolltolower"
+    >
+      <view id="top-anchor"></view>
       <view class="login" v-if="isLogin">
         <view class="haveCount" v-if="cartList?.length">
           <view class="top">
@@ -219,6 +234,7 @@ onShow(() => {
       </view>
       <XtxGuess ref="XtxGuessRef"></XtxGuess>
     </scroll-view>
+    <BackTop v-model="scrollIntoView" :scroll-top="scrollTop" bottom="230rpx"></BackTop>
   </view>
 </template>
 

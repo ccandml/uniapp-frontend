@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import XtxGuess from '@/components/XtxGuess.vue'
+import BackTop from '@/components/BackTop.vue'
 import { useMemberStore } from '@/stores'
 import { computed, ref } from 'vue'
 
@@ -23,6 +24,12 @@ const XtxGuessRef = ref()
 const onScroll = () => {
   XtxGuessRef.value.getGuessList()
 }
+const scrollTop = ref(0)
+const onPageScroll = (e: any) => {
+  scrollTop.value = e.detail.scrollTop
+}
+// 通过全局回到顶部组件控制当前 scroll-view 回顶。
+const scrollIntoView = ref('')
 // 登录
 const goLogin = () => {
   uni.navigateTo({
@@ -99,10 +106,19 @@ console.log(SystemInfo.safeAreaInsets?.top)
       </view>
     </view>
     <!-- 猜你喜欢 -->
-    <scroll-view @scrolltolower="onScroll" class="scroll" scroll-y>
+    <scroll-view
+      @scroll="onPageScroll"
+      @scrolltolower="onScroll"
+      :scroll-into-view="scrollIntoView"
+      scroll-with-animation
+      class="scroll"
+      scroll-y
+    >
+      <view id="top-anchor"></view>
       <view class="top"></view>
       <XtxGuess ref="XtxGuessRef"></XtxGuess>
     </scroll-view>
+    <BackTop v-model="scrollIntoView" :scroll-top="scrollTop" bottom="240rpx"></BackTop>
   </view>
 </template>
 

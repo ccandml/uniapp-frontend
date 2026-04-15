@@ -1,6 +1,7 @@
 import { useMemberStore } from '@/stores'
 
-const BASE_URL = 'https://cyx-0sar.onrender.com/cyx/v1'
+// const BASE_URL = 'https://cyx-0sar.onrender.com/cyx/v1'
+const BASE_URL = 'http://localhost:3000/cyx/v1'
 const httpInterceptor = {
   // 请求前拦截
   invoke(options: UniApp.RequestOptions) {

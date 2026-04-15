@@ -5,6 +5,7 @@ import XtxBanner from '@/components/XtxBanner.vue'
 import CategoryPanel from './components/CategoryPanel.vue'
 import HotPanel from './components/HotPanel.vue'
 import XtxGuess from '@/components/XtxGuess.vue'
+import BackTop from '@/components/BackTop.vue'
 import SkeletonPage from './components/SkeletonPage.vue'
 import type { XtxGuessInstance } from '../../types/components'
 import type { BannerList, CategoryList, HotList } from '../../types/home'
@@ -40,11 +41,13 @@ const onScrollBottom = () => {
   XtxGuessRef.value?.getGuessList()
 }
 
-// 滚动位置（用于回到顶部）
 const scrollTop = ref(0)
-const onPageScroll = (e: any) => {
+const onScroll = (e: any) => {
   scrollTop.value = e.detail.scrollTop
 }
+
+// 仅在点击按钮时触发滚动到顶部，避免滚动过程中的回写导致小程序端回弹
+const scrollIntoView = ref('')
 
 // 下拉刷新
 const isTrigger = ref(false) // 是否在刷新？
@@ -62,12 +65,6 @@ const onRefresh = async () => {
   isTrigger.value = false
 }
 
-// 回到顶部并触发刷新
-const backTopAndRefresh = async () => {
-  scrollTop.value = 0
-  await onRefresh()
-}
-
 const isLoading = ref(false)
 onLoad(async () => {
   isLoading.value = true
@@ -81,17 +78,18 @@ onLoad(async () => {
     <!-- 自定义头部 -->
     <NavBar></NavBar>
     <scroll-view
-      @scroll="onPageScroll"
+      @scroll="onScroll"
       @scrolltolower="onScrollBottom"
       refresher-enabled
       :refresher-threshold="refreshThreshold"
       :refresher-triggered="isTrigger"
-      :scroll-top="scrollTop"
+      :scroll-into-view="scrollIntoView"
       scroll-with-animation
       @refresherrefresh="onRefresh"
       scroll-y
       class="scroll"
     >
+      <view id="top-anchor"></view>
       <!-- 骨架屏 -->
       <SkeletonPage v-if="isLoading"></SkeletonPage>
 
@@ -106,8 +104,7 @@ onLoad(async () => {
         <XtxGuess ref="XtxGuessRef"></XtxGuess>
       </template>
     </scroll-view>
-
-    <view class="back-top" @click="backTopAndRefresh">↑</view>
+    <BackTop v-model="scrollIntoView" :scroll-top="scrollTop"></BackTop>
   </view>
 </template>
 
@@ -130,22 +127,6 @@ page {
   .scroll {
     flex: 1;
     overflow: auto;
-  }
-
-  .back-top {
-    position: fixed;
-    right: 28rpx;
-    bottom: 220rpx;
-    width: 78rpx;
-    height: 78rpx;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.7);
-    color: #00bf9c;
-    font-size: 38rpx;
-    line-height: 78rpx;
-    text-align: center;
-    z-index: 999;
-    box-shadow: 0 8rpx 18rpx rgba(0, 0, 0, 0.18);
   }
 }
 </style>
