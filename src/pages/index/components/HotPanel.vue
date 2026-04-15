@@ -11,7 +11,7 @@ defineProps<{ list: HotList[] }>()
         <navigator
           :url="`/pages/Recommend/Recommend?type=${item.type}`"
           open-type="navigate"
-          hover-class="navigator-hover"
+          hover-class="none"
         >
           <view class="text">
             <view class="h1">{{ item.title }}</view>

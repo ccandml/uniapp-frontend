@@ -6,12 +6,55 @@ import CategoryPanel from './components/CategoryPanel.vue'
 import HotPanel from './components/HotPanel.vue'
 import XtxGuess from '@/components/XtxGuess.vue'
 import BackTop from '@/components/BackTop.vue'
+import SystemNoticePopup from '@/components/SystemNoticePopup.vue'
 import SkeletonPage from './components/SkeletonPage.vue'
 import type { XtxGuessInstance } from '../../types/components'
 import type { BannerList, CategoryList, HotList } from '../../types/home'
-import { getBannerAPI, getHomeCategoryAPI, getHomeHotAPI } from '@/service/home'
+import { getBannerAPI, getHomeCategoryAPI, getHomeHotAPI, getNoticeAPI } from '@/service/home'
 import { onLoad } from '@dcloudio/uni-app'
 const XtxGuessRef = ref<XtxGuessInstance>()
+
+const noticeVisible = ref(false)
+const noticeContent = ref('')
+
+// 读取 app 级会话标记：同一次启动过程中只允许展示一次系统公告。
+const hasShownNoticeThisLaunch = () => {
+  const app = getApp() as {
+    globalData?: {
+      hasShownSystemNotice?: boolean
+    }
+  }
+  return !!app.globalData?.hasShownSystemNotice
+}
+
+// 写入 app 级会话标记：页面刷新或切换 tab 回来时不再重复弹窗。
+const markNoticeShownThisLaunch = () => {
+  const app = getApp() as {
+    globalData?: {
+      hasShownSystemNotice?: boolean
+    }
+  }
+  if (!app.globalData) app.globalData = {}
+  app.globalData.hasShownSystemNotice = true
+}
+
+const showSystemNotice = async () => {
+  // 仅在本次应用启动会话中展示一次，避免首页刷新/回到首页重复弹出。
+  if (hasShownNoticeThisLaunch()) return
+
+  try {
+    const res = await getNoticeAPI()
+    // 后端公告可能为空字符串，空内容不弹窗。
+    const content = res.result?.content?.trim()
+    if (!content) return
+    // 只有在拿到有效内容时才标记为已展示，避免接口异常导致本次会话无法再展示。
+    markNoticeShownThisLaunch()
+    noticeContent.value = content
+    noticeVisible.value = true
+  } catch (error) {
+    console.error('获取系统公告失败:', error)
+  }
+}
 
 // 组件请求数据
 // 轮播图
@@ -67,6 +110,8 @@ const onRefresh = async () => {
 
 const isLoading = ref(false)
 onLoad(async () => {
+  // 启动后首次进入首页时触发公告检查（H5/小程序统一逻辑）。
+  void showSystemNotice()
   isLoading.value = true
   await Promise.all([getBannerList(), getCategoryList(), getHotList()])
   isLoading.value = false
@@ -105,6 +150,7 @@ onLoad(async () => {
       </template>
     </scroll-view>
     <BackTop v-model="scrollIntoView" :scroll-top="scrollTop"></BackTop>
+    <SystemNoticePopup v-model="noticeVisible" :content="noticeContent" />
   </view>
 </template>
 

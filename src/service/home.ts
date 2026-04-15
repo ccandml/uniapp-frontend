@@ -36,3 +36,11 @@ export const getGuessAPI = (data: PagesRequest) => {
     loading: false,
   })
 }
+
+// 获取系统公告
+export const getNoticeAPI = () => {
+  return http<{ content: string }>({
+    url: '/notice',
+    loading: false,
+  })
+}

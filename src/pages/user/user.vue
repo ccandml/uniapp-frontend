@@ -84,7 +84,7 @@ console.log(SystemInfo.safeAreaInsets?.top)
       <navigator url="/pagesMember/setting/setting" class="setting"> 设置 </navigator>
       <!-- 订单 -->
       <view class="order">
-        <navigator url="/pagesOrder/orderClassify/orderClassify">
+        <navigator url="/pagesOrder/orderClassify/orderClassify" hover-class="none">
           <view class="all">
             <view>全部订单</view>
             <uni-icons type="right" size="25" color="#ccc"></uni-icons>
@@ -96,6 +96,7 @@ console.log(SystemInfo.safeAreaInsets?.top)
             v-for="item in orderType"
             :key="item.type"
             :url="`/pagesOrder/orderClassify/orderClassify?type=${item.type}`"
+            hover-class="none"
           >
             <view class="content">
               <uni-icons :type="item.icon as any" size="30"></uni-icons>

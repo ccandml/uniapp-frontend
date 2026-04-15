@@ -14,17 +14,12 @@ export const stringLoginAPI = (stringData: stringData) => {
   })
 }
 
-// 小程序快捷登录（要钱）
-interface wxData {
-  code: string
-  encryptedData: string
-  iv: string
-}
-export const wxLoginAPI = (wxData: wxData) => {
+// 小程序快捷登录
+export const wechatLoginAPI = (data: { code: string }) => {
   return http<MemberData>({
     method: 'POST',
-    url: '/login/wxMin',
-    data: wxData,
+    url: '/auth/wechat-signin',
+    data,
   })
 }
 

@@ -77,7 +77,7 @@ const stopGlobalLoading = () => {
 }
 
 // 登录接口返回 401 时，只提示账号密码错误，不做全局过期跳转。
-const LOGIN_API_PATHS = ['/auth/signin', '/login/wxMin']
+const LOGIN_API_PATHS = ['/auth/signin', '/auth/wechat-signin', '/login/wxMin']
 
 const isLoginRequest = (url = '') => {
   return LOGIN_API_PATHS.some((path) => url.includes(path))

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { wxLoginAPI, buildLoginAPI, stringLoginAPI } from '@/service/login'
+import { wechatLoginAPI, buildLoginAPI, stringLoginAPI } from '@/service/login'
 import { useMemberStore } from '@/stores'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
@@ -46,49 +46,59 @@ const rules: UniHelper.UniFormsRules = {
     ],
   },
 }
-// #endif
 
-// #ifndef H5
-// 微信快捷登录
-let code: string
-onLoad(() => {
-  wx.login({
-    success: (res) => {
-      console.log(res)
-      code = res.code
-    },
-  })
-})
-const onGetPhoneNumber: UniHelper.ButtonOnGetphonenumber = async (res) => {
-  console.log(res)
-  const encryptedData = res.detail.encryptedData!
-  const iv = res.detail.iv!
-  const r = await wxLoginAPI({ code, encryptedData, iv })
-  console.log(r)
-  loginSuccess()
+const onSubmit = async () => {
+  try {
+    await form.value.validate()
+    const res = await stringLoginAPI(formData.value)
+    memberStore.setProfile(res.result)
+    loginSuccess()
+  } catch (error) {
+    uni.showToast({ icon: 'none', title: '登录失败，请检查账号密码' })
+  }
 }
 // #endif
 
-// #ifdef H5
-const onSubmit = async () => {
-  await form.value.validate()
-  const res = await stringLoginAPI(formData.value)
-  if (res.code == '401') {
-    uni.showToast({ icon: 'none', title: res.message || '登录失败' })
-    return
+// #ifndef H5
+// 微信快捷登录：点击时实时获取 code，避免页面停留过久导致 code 失效。
+const getWechatCode = () => {
+  return new Promise<string>((resolve, reject) => {
+    uni.login({
+      provider: 'weixin',
+      success: (res) => {
+        if (res.code) {
+          resolve(res.code)
+          return
+        }
+        reject(new Error(res.errMsg || '获取微信 code 失败'))
+      },
+      fail: reject,
+    })
+  })
+}
+
+const wechatLogin = async () => {
+  try {
+    const code = await getWechatCode()
+    const res = await wechatLoginAPI({ code })
+    memberStore.setProfile(res.result)
+    loginSuccess()
+  } catch (error) {
+    uni.showToast({ icon: 'none', title: '微信登录失败，请稍后再试' })
   }
-  console.log(res)
-  memberStore.setProfile(res.result)
-  loginSuccess()
 }
 // #endif
 
 // 更多登录
 const simpleLogin = async () => {
-  const res = await buildLoginAPI()
-  console.log(res)
-  memberStore.setProfile(res.result)
-  loginSuccess()
+  try {
+    const res = await buildLoginAPI()
+    console.log(res)
+    memberStore.setProfile(res.result)
+    loginSuccess()
+  } catch (error) {
+    uni.showToast({ icon: 'none', title: '登录失败，请稍后再试' })
+  }
 }
 
 const loginSuccess = () => {
@@ -135,8 +145,7 @@ const goRegister = () => {
 
     <!-- #ifndef H5 -->
     <view class="button">
-      <view class="showbutton">快捷登录</view>
-      <button open-type="getPhoneNumber" @getphonenumber="onGetPhoneNumber">登录</button>
+      <view class="showbutton" @click="wechatLogin">微信登录</view>
     </view>
     <!-- #endif -->
     <view class="moreLogin">
@@ -145,7 +154,9 @@ const goRegister = () => {
         <uni-icons type="contact" size="40" color="#ccc"></uni-icons>
       </view>
     </view>
-
+    <!-- #ifndef H5 -->
+    <view class="contract1">微信用户首次登录直接注册</view>
+    <!-- #endif -->
     <view class="contract">登录/注册即视为你同意《服务条款》和《晨曦优选隐私协议》</view>
   </view>
 </template>
@@ -222,6 +233,16 @@ const goRegister = () => {
     font-size: 14px;
   }
 
+  .contract1 {
+    color: $text-color-2;
+    font-size: 22rpx;
+    position: fixed;
+    bottom: 120rpx;
+    left: 0;
+    right: 0;
+    width: fit-content;
+    margin: 0 auto;
+  }
   .contract {
     color: $text-color-2;
     font-size: 22rpx;
@@ -235,10 +256,17 @@ const goRegister = () => {
 
   .moreLogin {
     color: #ccc;
-    margin: 40rpx auto;
+    /* #ifdef H5 */
+    margin: 38rpx auto 0;
+    /* #endif */
+    /* #ifndef H5 */
+    margin: 138rpx auto 0;
+    /* #endif */
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    z-index: 1;
     .more {
       margin-top: 30rpx;
     }

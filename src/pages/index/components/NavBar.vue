@@ -9,8 +9,8 @@ const goSearch = () => {
 <template>
   <view class="navbar" :style="{ 'padding-top': safeAreaInsets?.top + 'px' }">
     <view class="top">
-      <h2>晨曦优选</h2>
-      <text>新鲜 · 亲民 · 快捷</text>
+      <text class="title">晨曦优选</text>
+      <text class="subtitle">新鲜 · 亲民 · 快捷</text>
     </view>
     <view class="search" @click="goSearch">
       <view class="left">
@@ -32,13 +32,16 @@ const goSearch = () => {
     padding: 20rpx;
     display: flex;
     align-items: center;
-    h2 {
+    .title {
       color: #fff;
       font-family: 'HuaWen XingKai', 'Microsoft YaHei', serif;
-      font-weight: 550;
+      font-weight: 500;
       font-size: 40rpx;
-      margin: 0 20rpx;
+      margin: 0 10rpx 0 0;
       letter-spacing: 2rpx;
+    }
+    .subtitle {
+      border-left: 1px solid white;
     }
     image {
       width: 166rpx;
@@ -46,7 +49,6 @@ const goSearch = () => {
       margin: 0 20rpx;
     }
     text {
-      border-left: 1px solid white;
       padding: 0 20rpx;
       color: #fff;
       font-size: 26rpx;
