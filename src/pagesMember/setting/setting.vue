@@ -34,10 +34,12 @@ const logout = () => {
       <view class="item">
         <view class="left">问题反馈</view>
         <uni-icons type="right" size="25"></uni-icons>
+        <button class="contact-btn" open-type="contact"></button>
       </view>
       <view class="item">
         <view class="left">联系我们</view>
         <uni-icons type="right" size="25"></uni-icons>
+        <button class="contact-btn" open-type="contact"></button>
       </view>
     </view>
     <view class="card">
@@ -70,6 +72,7 @@ page {
     padding: 4rpx 20rpx;
     border-radius: 20rpx;
     .item {
+      position: relative;
       display: flex;
       justify-content: space-between;
       border-bottom: 1px solid #eee;
@@ -79,6 +82,20 @@ page {
       }
       :deep(.uni-icons) {
         color: #ccc !important;
+      }
+      .contact-btn {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        border: none;
+        background: transparent;
+        opacity: 0;
+        &::after {
+          border: none;
+        }
       }
     }
   }
