@@ -206,7 +206,7 @@ onShow(() => {
       <view class="nologin" v-else>
         <view class="box">
           <view class="title">登录后查看购物车</view>
-          <navigator url="/pages/login/login?redirect=%2Fpages%2Fcart%2Fcart" class="btn"
+          <navigator url="/pagesAuth/login/login?redirect=%2Fpages%2Fcart%2Fcart" class="btn"
             >去登陆</navigator
           >
         </view>

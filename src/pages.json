@@ -37,20 +37,6 @@
 			}
 		},
 		{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText": "登录",
-				"disableScroll": true
-			}
-		},
-		{
-			"path": "pages/register/register",
-			"style": {
-				"navigationBarTitleText": "注册",
-				"disableScroll": true
-			}
-		},
-		{
 			"path": "pages/Recommend/Recommend",
 			"style": {
 				"navigationBarTitleText": "特惠推荐"
@@ -121,6 +107,25 @@
 	},
 	// 分包加载配置
 	"subPackages": [
+		{
+			"root": "pagesAuth",
+			"pages": [
+				{
+					"path": "login/login",
+					"style": {
+						"navigationBarTitleText": "登录",
+						"disableScroll": true
+					}
+				},
+				{
+					"path": "register/register",
+					"style": {
+						"navigationBarTitleText": "注册",
+						"disableScroll": true
+					}
+				}
+			]
+		},
 		{
 			// 子包的根目录
 			"root": "pagesMember",

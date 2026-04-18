@@ -117,7 +117,7 @@ export const http = <T>(options: HttpRequestOptions) => {
             options?: Record<string, unknown>
           }
           const currentRoute = currentPage?.route
-          if (currentRoute !== 'pages/login/login') {
+          if (currentRoute !== 'pagesAuth/login/login') {
             const path = `/${currentRoute}`
             const query = Object.entries(currentPage?.options || {})
               .map(
@@ -127,7 +127,7 @@ export const http = <T>(options: HttpRequestOptions) => {
             const redirect = query ? `${path}?${query}` : path
             // 记录来源页，登录成功后可回跳；同时用 redirectTo 避免 401 时页面栈循环堆积
             uni.redirectTo({
-              url: `/pages/login/login?redirect=${encodeURIComponent(redirect)}`,
+              url: `/pagesAuth/login/login?redirect=${encodeURIComponent(redirect)}`,
             })
           }
           reject(res)

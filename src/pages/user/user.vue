@@ -33,7 +33,7 @@ const scrollIntoView = ref('')
 // 登录
 const goLogin = () => {
   uni.navigateTo({
-    url: '/pages/login/login',
+    url: '/pagesAuth/login/login',
   })
 }
 // 修改信息

@@ -164,7 +164,7 @@ const onBuy = async (e: SkuPopupEvent) => {
   if (memberStore.profile?.access_token) {
     uni.navigateTo({ url: `/pagesOrder/writeOrder/writeOrder?skuId=${e._id}&count=${e.buy_num}` })
   } else {
-    uni.navigateTo({ url: '/pages/login/login' })
+    uni.navigateTo({ url: '/pagesAuth/login/login' })
   }
 }
 

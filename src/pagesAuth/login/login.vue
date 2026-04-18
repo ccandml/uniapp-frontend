@@ -119,13 +119,13 @@ const loginSuccess = () => {
 }
 
 const goRegister = () => {
-  uni.navigateTo({ url: '/pages/register/register' })
+  uni.navigateTo({ url: '/pagesAuth/register/register' })
 }
 </script>
 
 <template>
   <view class="login">
-    <image src="../../static//images//logo_icon.png" mode="widthFix" />
+    <image src="../static/images/logo_icon.png" mode="widthFix" />
 
     <!-- #ifdef H5 -->
     <uni-forms validate-trigger="blur" ref="form" v-model="formData" :rules="rules">

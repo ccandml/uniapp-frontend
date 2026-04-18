@@ -61,7 +61,7 @@ const onSubmit = async () => {
 
 <template>
   <view class="register">
-    <image src="../../static//images//logo_icon.png" mode="widthFix" />
+    <image src="../static/images/logo_icon.png" mode="widthFix" />
 
     <uni-forms validate-trigger="blur" ref="form" v-model="formData" :rules="rules">
       <uni-forms-item required name="username">
