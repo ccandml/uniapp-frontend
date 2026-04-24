@@ -8,29 +8,63 @@ const data = ref<PagesRequest>({
   page: 1,
   pageSize: 10,
 })
+const THROTTLE_DELAY = 400
+let throttleTimer: ReturnType<typeof setTimeout> | null = null
+let lastTriggerTime = 0
 // 重置状态
 const resetData = () => {
   data.value.page = 1
   isFinish.value = false
   guessList.value = []
+  // 重置节流窗口，避免重置后首次请求被拦截
+  lastTriggerTime = 0
+  if (throttleTimer) {
+    clearTimeout(throttleTimer)
+    throttleTimer = null
+  }
 }
 // 请求状态
 const isFinish = ref(false)
+const isLoading = ref(false)
 const guessList = ref<GuessList[]>([])
-const getGuessList = async () => {
+const fetchGuessList = async () => {
   // 停止请求
-  if (isFinish.value) {
+  if (isFinish.value || isLoading.value) {
     return
   }
 
-  const res = await getGuessAPI(data.value)
-  console.log(res)
+  isLoading.value = true
+  try {
+    const res = await getGuessAPI(data.value)
 
-  guessList.value = [...guessList.value, ...res.result.items]
-  data.value.page++
-  // 到底了
-  if (res.result.items.length < data.value.pageSize) {
-    isFinish.value = true
+    guessList.value = [...guessList.value, ...res.result.items]
+    data.value.page++
+    // 到底了
+    if (res.result.items.length < data.value.pageSize) {
+      isFinish.value = true
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const getGuessList = () => {
+  const now = Date.now()
+  const remain = THROTTLE_DELAY - (now - lastTriggerTime)
+
+  if (remain <= 0) {
+    lastTriggerTime = now
+    fetchGuessList()
+    return
+  }
+
+  if (!throttleTimer) {
+    // 保留一次尾触发，避免高频触底时漏掉最后一次加载
+    throttleTimer = setTimeout(() => {
+      lastTriggerTime = Date.now()
+      throttleTimer = null
+      fetchGuessList()
+    }, remain)
   }
 }
 
